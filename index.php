@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>SE2026 Monitoring Center</title>
+    <title>PES SE2026 Monitoring Center</title>
     <link rel="icon" type="image/png" href="assets/img/favicon.png">
 
     <!-- Bootstrap -->
