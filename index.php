@@ -1262,7 +1262,7 @@
             <div class="logo">
                 <i class="bi bi-bar-chart-fill"></i>
                 <div>
-                    SE2026 Monitoring Center
+                    PES SE2026 Monitoring Center
                     <div class="sub-title">Monitoring Pendataan • Kota Dumai</div>
                 </div>
             </div>
