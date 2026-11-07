@@ -6,7 +6,7 @@
 | hari sebelumnya yang tersimpan di data/history/.
 |
 | Rumus per role:
-|   PENCACAH  : progressTotal   = (submitted + approved + edited + rejected + revoked) / assignment
+|   PENCACAH  : progressTotal   = (submitted + completedByPengawas + approved + edited + rejected + revoked) / assignment
 |   PENGAWAS  : progressReview  = (approved + edited + rejected + revoked) / assignment
 |
 | Menghasilkan 4 kartu ranking:
@@ -47,6 +47,7 @@ function calcProgressFromRaw(user) {
   if (assignment <= 0) return 0;
 
   let submitted = 0,
+    completedByPengawas = 0,
     approved = 0,
     rejected = 0,
     revoked = 0,
@@ -56,6 +57,7 @@ function calcProgressFromRaw(user) {
     (region.statusBreakdown || []).forEach((s) => {
       const c = Number(s.count) || 0;
       if (s.status === "SUBMITTED BY Pencacah") submitted += c;
+      else if (s.status === "COMPLETED BY Pengawas") completedByPengawas += c;
       else if (s.status === "APPROVED BY Pengawas") approved += c;
       else if (s.status === "REJECTED BY Pengawas") rejected += c;
       else if (s.status === "REVOKED BY Pengawas") revoked += c;
@@ -66,8 +68,8 @@ function calcProgressFromRaw(user) {
 
   const numerator =
     comparisonRole() === "pengawas"
-      ? approved + edited + rejected + revoked // progressReview
-      : submitted + approved + edited + rejected + revoked; // progressTotal
+      ? completedByPengawas + approved + edited + rejected + revoked // progressReview
+      : submitted + completedByPengawas + approved + edited + rejected + revoked; // progressTotal
 
   return Number(((numerator / assignment) * 100).toFixed(2));
 }
@@ -101,6 +103,8 @@ function aggregateRaw(rawArray) {
     open: 0,
     draft: 0,
     submitted: 0,
+    submittedRespondent: 0,
+    completedByPengawas: 0,
     approved: 0,
     edited: 0,
     rejected: 0,
@@ -121,6 +125,8 @@ function aggregateRaw(rawArray) {
         if (s.status === "OPEN") sum.open += c;
         else if (s.status === "DRAFT") sum.draft += c;
         else if (s.status === "SUBMITTED BY Pencacah") sum.submitted += c;
+        else if (s.status === "SUBMITTED RESPONDENT") sum.submittedRespondent += c;
+        else if (s.status === "COMPLETED BY Pengawas") sum.completedByPengawas += c;
         else if (s.status === "APPROVED BY Pengawas") sum.approved += c;
         else if (s.status === "REJECTED BY Pengawas") sum.rejected += c;
         else if (s.status === "REVOKED BY Pengawas") sum.revoked += c;
@@ -130,8 +136,8 @@ function aggregateRaw(rawArray) {
     });
   });
 
-  sum.reviewed = sum.approved + sum.edited + sum.rejected + sum.revoked;
-  sum.completed = sum.submitted + sum.reviewed;
+  sum.reviewed = sum.completedByPengawas + sum.approved + sum.edited + sum.rejected + sum.revoked;
+  sum.completed = sum.submitted + sum.submittedRespondent + sum.reviewed;
 
   const pct = (n) =>
     sum.assignment > 0 ? Number(((n / sum.assignment) * 100).toFixed(2)) : 0;
