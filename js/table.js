@@ -48,7 +48,7 @@ function regionProgress(r) {
   if (assignment <= 0) return 0;
 
   const reviewed =
-    (r.approved || 0) + (r.edited || 0) + (r.rejected || 0) + (r.revoked || 0);
+    (r.completedByPengawas || 0) + (r.approved || 0) + (r.edited || 0) + (r.rejected || 0) + (r.revoked || 0);
   const completed =
     (r.submitted || 0) + (r.submittedRespondent || 0) + reviewed;
 
@@ -94,6 +94,7 @@ function statusColumns() {
       minWidth: 90,
       headerTooltip: "SUBMITTED RESPONDENT",
     },
+    { title: "Completed<br>Pengawas", field: "completedByPengawas", titleFormatter: "html", hozAlign: "right", headerHozAlign: "center", minWidth: 105, headerTooltip: "COMPLETED BY Pengawas" },
     { title: "Approved", field: "approved", hozAlign: "right", headerHozAlign: "center", minWidth: 90 },
     {
       title: "Edited<br>Admin Kab",
@@ -135,6 +136,7 @@ function renderTable() {
     draft: e.draft,
     submitted: e.submitted,
     submittedRespondent: e.submittedRespondent || 0,
+    completedByPengawas: e.completedByPengawas || 0,
     approved: e.approved,
     editedAdmin: e.editedAdmin || 0,
     editedPengawas: e.editedPengawas || 0,
@@ -205,6 +207,7 @@ function renderTableDetail() {
         draft: r.draft || 0,
         submitted: r.submitted || 0,
         submittedRespondent: r.submittedRespondent || 0,
+        completedByPengawas: r.completedByPengawas || 0,
         approved: r.approved || 0,
         editedAdmin: r.editedAdmin || 0,
         editedPengawas: r.editedPengawas || 0,
