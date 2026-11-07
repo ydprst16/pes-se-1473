@@ -6,8 +6,9 @@
 | hari sebelumnya yang tersimpan di data/history/.
 |
 | Rumus per role:
-|   PENCACAH  : progressTotal   = (submitted + completedByPengawas + approved + edited + rejected + revoked) / assignment
-|   PENGAWAS  : progressReview  = (approved + edited + rejected + revoked) / assignment
+|   PENCACAH  : progressTotal  = (submitted + reviewed) / assignment
+|   PENGAWAS  : progressReview = reviewed / assignment
+|   reviewed  = completedByPengawas + approved + edited + rejected + revoked
 |
 | Menghasilkan 4 kartu ranking:
 |   1. Top 5 tertinggi (persentase hari ini terbesar)
@@ -66,10 +67,13 @@ function calcProgressFromRaw(user) {
     });
   });
 
+  const reviewed =
+    completedByPengawas + approved + edited + rejected + revoked;
+
   const numerator =
     comparisonRole() === "pengawas"
-      ? completedByPengawas + approved + edited + rejected + revoked // progressReview
-      : submitted + completedByPengawas + approved + edited + rejected + revoked; // progressTotal
+      ? reviewed // PML: reviewed / total assignment
+      : submitted + reviewed; // PPL: submitted + reviewed / total assignment
 
   return Number(((numerator / assignment) * 100).toFixed(2));
 }
@@ -269,8 +273,14 @@ function renderComparison() {
 
   const items = Comparison.items;
 
-  const topHigh = [...items].sort((a, b) => b.today - a.today).slice(0, 5);
-  const topLow = [...items].sort((a, b) => a.today - b.today).slice(0, 5);
+  // PML ditampilkan Top 3; PPL tetap Top 5.
+  const rankLimit = roleLabel === "PML" ? 3 : 5;
+  const topHigh = [...items]
+    .sort((a, b) => b.today - a.today)
+    .slice(0, rankLimit);
+  const topLow = [...items]
+    .sort((a, b) => a.today - b.today)
+    .slice(0, rankLimit);
 
   const withDelta = items.filter((x) => x.delta !== null);
   const topGain = [...withDelta].sort((a, b) => b.delta - a.delta).slice(0, 5);
@@ -286,7 +296,7 @@ function renderComparison() {
       id: "cmpTopHigh",
       icon: "bi-arrow-up-circle-fill",
       iconColor: "#ffffff",
-      title: `TOP 5 ${roleLabel} TERTINGGI`,
+      title: `TOP ${rankLimit} ${roleLabel} TERTINGGI`,
       list: topHigh,
       mode: "value",
       valueClass: "value-white",
@@ -295,7 +305,7 @@ function renderComparison() {
       id: "cmpTopLow",
       icon: "bi-arrow-down-circle-fill",
       iconColor: "#ffffff",
-      title: `TOP 5 ${roleLabel} TERENDAH`,
+      title: `TOP ${rankLimit} ${roleLabel} TERENDAH`,
       list: topLow,
       mode: "value",
       valueClass: "value-white",
