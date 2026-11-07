@@ -32,6 +32,7 @@ const Dashboard = {
     draft: 0,
     submitted: 0,
     submittedRespondent: 0,
+    completedByPengawas: 0,
     approved: 0,
     editedAdmin: 0,
     editedPengawas: 0,
@@ -85,6 +86,7 @@ const STATUS_MAP = {
   DRAFT: "draft",
   "SUBMITTED BY Pencacah": "submitted",
   "SUBMITTED RESPONDENT": "submittedRespondent",
+  "COMPLETED BY Pengawas": "completedByPengawas",
   "APPROVED BY Pengawas": "approved",
   "REJECTED BY Pengawas": "rejected",
   "REVOKED BY Pengawas": "revoked",
@@ -168,6 +170,7 @@ function resetDashboard() {
     draft: 0,
     submitted: 0,
     submittedRespondent: 0,
+    completedByPengawas: 0,
     approved: 0,
     editedAdmin: 0,
     editedPengawas: 0,
@@ -303,6 +306,7 @@ function buildStatus() {
     s.open,
     s.draft,
     s.submitted,
+    s.completedByPengawas,
     s.approved,
     s.edited,
     s.rejected,
@@ -400,6 +404,7 @@ function processEnumerator(user) {
     draft: 0,
     submitted: 0,
     submittedRespondent: 0,
+    completedByPengawas: 0,
     approved: 0,
     editedAdmin: 0,
     editedPengawas: 0,
@@ -425,6 +430,7 @@ function processEnumerator(user) {
     enumerator.draft += result.draft;
     enumerator.submitted += result.submitted;
     enumerator.submittedRespondent += result.submittedRespondent;
+    enumerator.completedByPengawas += result.completedByPengawas;
     enumerator.approved += result.approved;
     enumerator.editedAdmin += result.editedAdmin;
     enumerator.editedPengawas += result.editedPengawas;
@@ -438,6 +444,7 @@ function processEnumerator(user) {
   Dashboard.summary.draft += enumerator.draft;
   Dashboard.summary.submitted += enumerator.submitted;
   Dashboard.summary.submittedRespondent += enumerator.submittedRespondent;
+  Dashboard.summary.completedByPengawas += enumerator.completedByPengawas;
   Dashboard.summary.approved += enumerator.approved;
   Dashboard.summary.editedAdmin += enumerator.editedAdmin;
   Dashboard.summary.editedPengawas += enumerator.editedPengawas;
@@ -473,6 +480,7 @@ function processRegion(region) {
       region.statusBreakdown,
       "SUBMITTED RESPONDENT",
     ),
+    completedByPengawas: getStatusCount(region.statusBreakdown, "COMPLETED BY Pengawas"),
     approved: getStatusCount(region.statusBreakdown, "APPROVED BY Pengawas"),
     rejected: getStatusCount(region.statusBreakdown, "REJECTED BY Pengawas"),
     revoked: getStatusCount(region.statusBreakdown, "REVOKED BY Pengawas"),
@@ -496,8 +504,8 @@ function calculateProgress(item) {
     return;
   }
 
-  item.reviewed = item.approved + item.edited + item.rejected + item.revoked;
-  item.completed = item.submitted + item.reviewed;
+  item.reviewed = item.completedByPengawas + item.approved + item.edited + item.rejected + item.revoked;
+  item.completed = item.submitted + item.submittedRespondent + item.reviewed;
 
   item.progressSubmit = percentage(item.submitted, item.assignment);
   item.progressApprove = percentage(item.approved, item.assignment);
@@ -522,6 +530,7 @@ function buildDistrict() {
           draft: 0,
           submitted: 0,
           submittedRespondent: 0,
+          completedByPengawas: 0,
           approved: 0,
           editedAdmin: 0,
           editedPengawas: 0,
@@ -544,6 +553,7 @@ function buildDistrict() {
       d.draft += region.draft;
       d.submitted += region.submitted;
       d.submittedRespondent += region.submittedRespondent;
+      d.completedByPengawas += region.completedByPengawas;
       d.approved += region.approved;
       d.editedAdmin += region.editedAdmin;
       d.editedPengawas += region.editedPengawas;
@@ -551,9 +561,11 @@ function buildDistrict() {
       d.rejected += region.rejected;
       d.revoked += region.revoked;
       d.reviewed +=
-        region.approved + region.edited + region.rejected + region.revoked;
+        region.completedByPengawas + region.approved + region.edited + region.rejected + region.revoked;
       d.completed +=
         region.submitted +
+        region.submittedRespondent +
+        region.completedByPengawas +
         region.approved +
         region.edited +
         region.rejected +
@@ -578,8 +590,8 @@ function buildDistrict() {
 function calculateSummary() {
   const s = Dashboard.summary;
   s.edited = s.editedAdmin + s.editedPengawas;
-  s.reviewed = s.approved + s.edited + s.rejected + s.revoked;
-  s.completed = s.submitted + s.reviewed;
+  s.reviewed = s.completedByPengawas + s.approved + s.edited + s.rejected + s.revoked;
+  s.completed = s.submitted + s.submittedRespondent + s.reviewed;
 
   s.progressSubmit = percentage(s.submitted, s.assignment);
   s.progressApprove = percentage(s.approved, s.assignment);
