@@ -274,7 +274,10 @@ function renderComparison() {
 
   const withDelta = items.filter((x) => x.delta !== null);
   const topGain = [...withDelta].sort((a, b) => b.delta - a.delta).slice(0, 5);
+  // Hanya tampilkan PPL/PML yang benar-benar mengalami penurunan.
+  // Delta 0 (tidak berubah) dan delta positif tidak masuk daftar ini.
   const topLowGain = [...withDelta]
+    .filter((x) => x.delta < 0)
     .sort((a, b) => a.delta - b.delta)
     .slice(0, 5);
 
@@ -311,10 +314,10 @@ function renderComparison() {
       id: "cmpTopLowGain",
       icon: "bi-graph-down-arrow",
       iconColor: "#ef4444",
-      title: "TOP PENINGKATAN TERENDAH",
+      title: "TOP PENURUNAN HARIAN",
       list: topLowGain,
       mode: "delta",
-      valueClass: "value-green",
+      valueClass: "value-red",
       empty: !Comparison.available,
     })}
   `;
@@ -340,7 +343,11 @@ function renderRankCard({
   if (empty) {
     body = `<div class="cmp-empty">Belum ada data pembanding</div>`;
   } else if (!list.length) {
-    body = `<div class="cmp-empty">Tidak ada data</div>`;
+    body = `<div class="cmp-empty">${
+      id === "cmpTopLowGain"
+        ? "Tidak ada PPL/PML yang mengalami penurunan"
+        : "Tidak ada data"
+    }</div>`;
   } else {
     body = list
       .map((row) => {
