@@ -125,7 +125,7 @@ function destroyCharts() {
   }
 }
 
-/* ---------- Status Donut (7 kategori) ---------- */
+/* ---------- Status Donut (8 kategori) ---------- */
 function renderStatusChart() {
   const el = document.querySelector("#statusChart");
   if (!el) return;
@@ -136,6 +136,7 @@ function renderStatusChart() {
       "Open",
       "Draft",
       "Submitted",
+      "Completed by Pengawas",
       "Approved",
       "Edited",
       "Rejected",
@@ -146,6 +147,7 @@ function renderStatusChart() {
       "#64748b",
       "#94a3b8",
       "#f59e0b",
+      "#16a34a",
       "#22c55e",
       "#8b5cf6",
       "#ef4444",
@@ -207,6 +209,7 @@ function renderDistrictChart() {
             Approved   : ${formatNumber(d.approved)}<br/>
             Edited     : ${formatNumber(d.edited ?? 0)}<br/>
             Submitted  : ${formatNumber(d.submitted)}<br/>
+            Completed by Pengawas : ${formatNumber(d.completedByPengawas ?? 0)}<br/>
             Rejected   : ${formatNumber(d.rejected)}<br/>
             Revoked    : ${formatNumber(d.revoked)}<br/>
             <b>Progress : ${prog.toFixed(2)}%</b>
@@ -294,6 +297,7 @@ function renderPerformerList(container, data, color = "primary") {
           <small class="text-muted">
             Assignment : <b>${formatNumber(item.assignment)}</b> |
             Submitted : <b>${formatNumber(item.submitted)}</b> |
+            Completed : <b>${formatNumber(item.completedByPengawas ?? 0)}</b> |
             Approved : <b>${formatNumber(item.approved)}</b>
           </small>
         </div>
@@ -361,6 +365,7 @@ function exportDistributionToExcel(bucketFilter) {
         Open: e.open || 0,
         Draft: e.draft || 0,
         Submitted: e.submitted || 0,
+        "Completed by Pengawas": e.completedByPengawas || 0,
         Approved: e.approved || 0,
         Edited: e.edited || 0,
         Rejected: e.rejected || 0,
@@ -385,8 +390,8 @@ function exportDistributionToExcel(bucketFilter) {
     [
       "Rumus Progress",
       role === "pengawas"
-        ? "(Approved + Edited + Rejected + Revoked) / Assignment × 100%"
-        : "(Submitted + Approved + Edited + Rejected + Revoked) / Assignment × 100%",
+        ? "(Completed by Pengawas + Approved + Edited + Rejected + Revoked) / Assignment × 100%"
+        : "(Submitted + Completed by Pengawas + Approved + Edited + Rejected + Revoked) / Assignment × 100%",
     ],
     [],
     ["Bucket", "Jumlah"],
