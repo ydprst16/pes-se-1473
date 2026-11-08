@@ -652,3 +652,41 @@ cd se2026-monitoring-center
 - Snapshot harian digunakan sebagai dasar perhitungan comparison.
 - Penyimpanan data sepenuhnya menggunakan Supabase Storage sehingga tidak memerlukan database relasional.
 ````
+
+---
+
+## Keberadaan Usaha module
+
+The application includes an independent **Keberadaan Usaha** module. It does not change the existing PPL/PML monitoring upload, processing, or storage paths.
+
+### Supabase Storage layout
+
+The module uses the existing Supabase bucket configured by `SUPABASE_BUCKET` (default: `data`) and creates its own object prefix:
+
+```text
+business_presence/
+├── latest.json
+└── history/
+    ├── YYYY-MM-DD.json
+    └── ...
+```
+
+The Excel workbook is parsed in the browser with the already-loaded SheetJS library. The resulting normalized JSON is sent to `api/business_presence.php`. The API validates the upload password using the existing security helper, validates required columns and duplicate assignment IDs, writes the dated snapshot, and then updates `latest.json`. Existing PPL/PML objects (`latest.json`, `latest_pengawas.json`, `history/`, and `history_pengawas/` at the existing root paths) are not modified by this module; note that the `business_presence/` prefix is separate from those root objects.
+
+### Import format
+
+The first worksheet is read. Required columns are `prov`, `kab`, `kec`, `des`, `sls`, `ssls`, `id`, and `ada_bang_usaha_label`. The six geographic codes are preserved as strings and concatenated into a 16-digit `idsubsls`. Other available workbook columns are retained in the JSON records.
+
+### Upload workflow
+
+1. Open **Keberadaan Usaha** and choose **Upload Excel**.
+2. Select the workbook and snapshot date.
+3. Review the parsed row count and validation errors.
+4. Enter the existing upload password and import.
+5. The module stores `business_presence/history/YYYY-MM-DD.json` and updates `business_presence/latest.json` only after the snapshot write succeeds.
+
+The same snapshot date is an upsert: importing again for that date replaces that date's snapshot. The previous `latest.json` remains available if parsing or validation fails before storage writes.
+
+### Petugas view
+
+The module can display a PPL/PML breakdown by matching Excel `idsubsls` to `regionSummary[].regionCode` in the existing PPL/PML JSON feeds. This is a **regional assignment mapping**, not an exact UUID-to-user join, because the current PPL/PML JSON exports contain regional summaries rather than individual assignment UUIDs. Ensure region assignments are unique between officers if the per-officer attribution is to be interpreted as exclusive.

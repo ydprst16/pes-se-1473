@@ -1251,6 +1251,26 @@
         [data-bs-theme="light"] .flatpickr-day.nextMonthDay {
             color: #9ca3af;
         }
+        /* Secondary module navigation: compact underline tabs below the main app header */
+        .module-navigation {
+            display:flex; align-items:center; gap:clamp(1.25rem, 3vw, 2.25rem);
+            border-bottom:1px solid var(--border); margin:0 0 1.5rem; padding:0 .15rem;
+            overflow-x:auto; scrollbar-width:thin;
+        }
+        .module-navigation .module-tab {
+            appearance:none; border:0; border-bottom:3px solid transparent; background:transparent;
+            color:var(--text-mute); padding:.85rem .15rem .78rem; margin-bottom:-1px;
+            display:inline-flex; align-items:center; gap:.55rem; white-space:nowrap;
+            font-size:.92rem; font-weight:600; transition:color .18s ease,border-color .18s ease;
+        }
+        .module-navigation .module-tab i { font-size:1rem; }
+        .module-navigation .module-tab:hover { color:var(--text); }
+        .module-navigation .module-tab.active { color:var(--primary); border-bottom-color:var(--primary); }
+        .module-navigation .module-tab:focus-visible { outline:2px solid var(--primary); outline-offset:3px; border-radius:4px; }
+        @media (max-width:575.98px) {
+            .module-navigation { gap:1.25rem; margin-bottom:1.1rem; }
+            .module-navigation .module-tab { font-size:.82rem; padding:.75rem .1rem .68rem; }
+        }
     </style>
 
 </head>
@@ -1295,6 +1315,15 @@
     </header>
 
     <div class="container-dashboard">
+        <nav class="module-navigation" role="tablist" aria-label="Navigasi modul">
+            <button class="module-tab active" id="menuMonitoring" type="button" role="tab" aria-selected="true" aria-controls="monitoringModule">
+                <i class="bi bi-speedometer2"></i><span>Monitoring Progress</span>
+            </button>
+            <button class="module-tab" id="menuBusinessPresence" type="button" role="tab" aria-selected="false" aria-controls="businessPresenceModule">
+                <i class="bi bi-people-fill"></i><span>Keberadaan Keluarga/Usaha</span>
+            </button>
+        </nav>
+        <section id="monitoringModule">
 
         <div class="mb-4 d-flex justify-content-center">
             <div class="role-tabs">
@@ -1554,6 +1583,77 @@
                         Powered by Bootstrap 5 • ApexCharts • Grid.js
                     </small>
                 </footer>
+        </section>
+
+                <div class="modal fade" id="businessUploadModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg"><div class="modal-content">
+                        <div class="modal-header"><h5 class="modal-title"><i class="bi bi-file-earmark-excel me-2"></i>Upload Keberadaan Keluarga/Usaha</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <div class="modal-body">
+                            <div class="mb-3"><label class="form-label">File Excel (.xlsx / .xls)</label><input class="form-control" type="file" id="businessExcelFile" accept=".xlsx,.xls"></div>
+                            <div class="mb-3"><label class="form-label">Tanggal snapshot</label><input class="form-control" type="date" id="businessImportDate"></div>
+                            <div class="mb-3"><label class="form-label">Password upload</label><input class="form-control" type="password" id="businessUploadPassword" autocomplete="current-password"></div>
+                            <div id="businessImportPreview" class="small text-secondary">Pilih file Excel untuk melihat preview dan validasi.</div>
+                            <div class="alert alert-info mt-3 mb-0 small">File akan dikonversi menjadi JSON dan disimpan terpisah di Supabase Storage: <code>business_presence/</code>.</div>
+                        </div>
+                        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button class="btn btn-primary" id="btnBusinessImport" disabled><i class="bi bi-cloud-upload me-1"></i> Import ke Supabase</button></div>
+                    </div></div>
+                </div>
+
+        <section id="businessPresenceModule" class="d-none">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                <div><h3 class="mb-1"><i class="bi bi-people-fill text-primary me-2"></i>Keberadaan Keluarga/Usaha</h3><div class="text-secondary small">Monitoring keberadaan keluarga, keberadaan usaha, dan status pendataan berdasarkan file Excel harian.</div></div>
+                <div class="d-flex gap-2"><button class="btn btn-outline-secondary" id="btnBusinessRefresh"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button><button class="btn btn-primary" id="btnOpenBusinessUpload"><i class="bi bi-upload me-1"></i>Upload Excel</button></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div class="small text-secondary">Snapshot aktif: <strong id="businessSnapshotDate">-</strong> · Import terakhir: <strong id="businessUpdatedAt">-</strong></div>
+                <select class="form-select form-select-sm" id="businessHistorySelect" style="max-width:190px"><option value="">Data terbaru</option></select>
+            </div>
+            <div class="row g-3 mb-4" id="businessKpis">
+                <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card h-100"><div class="kpi-title">Total Assignment</div><div class="kpi-value" id="bpTotal">-</div><div class="small text-secondary">Jumlah seluruh baris Excel</div></div></div>
+                <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card h-100"><div class="kpi-title">Assignment Keluarga Terisi</div><div class="kpi-value" id="bpFamilyFilled">-</div><div class="small text-secondary">Kolom ada_keluarga_label</div></div></div>
+                <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card h-100"><div class="kpi-title">Assignment Usaha Terisi</div><div class="kpi-value" id="bpBusinessFilled">-</div><div class="small text-secondary">Kolom ada_bang_usaha_label</div></div></div>
+                <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card h-100"><div class="kpi-title">Persentase Isian Gabungan</div><div class="kpi-value" id="bpCombinedPercent">-</div><div class="small text-secondary" id="bpCombinedDetail">Assignment dengan minimal satu isian</div></div></div>
+            </div>
+            <style>
+                .bp-breakdown-card{border:1px solid var(--bs-border-color);border-radius:14px;background:var(--bs-body-bg);padding:1.1rem;height:100%;}
+                .bp-breakdown-head{display:flex;align-items:center;gap:.7rem;margin-bottom:.85rem;}
+                .bp-breakdown-icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(13,110,253,.09);color:var(--bs-primary);font-size:1.05rem;flex:0 0 auto;}
+                .bp-breakdown-subtitle{font-size:.76rem;color:var(--bs-secondary-color);}
+                .bp-breakdown-table{margin-bottom:0;vertical-align:middle;}
+                .bp-breakdown-table thead th{font-size:.7rem;text-transform:uppercase;letter-spacing:.035em;color:var(--bs-secondary-color);font-weight:700;border-bottom:1px solid var(--bs-border-color);padding:.65rem .5rem;white-space:nowrap;}
+                .bp-breakdown-table tbody td{padding:.72rem .5rem;border-bottom:1px solid var(--bs-border-color-translucent);font-size:.84rem;}
+                .bp-breakdown-table tbody tr:last-child td{border-bottom:0;}
+                .bp-category-name{font-weight:600;display:block;margin-bottom:.38rem;}
+                .bp-category-track{height:5px;border-radius:99px;background:var(--bs-tertiary-bg);overflow:hidden;max-width:250px;}
+                .bp-category-fill{height:100%;border-radius:99px;background:var(--bs-primary);}
+                .bp-count-pill{display:inline-block;min-width:48px;text-align:center;padding:.28rem .55rem;border-radius:8px;background:var(--bs-tertiary-bg);font-weight:700;font-variant-numeric:tabular-nums;}
+                .bp-mobile-list{display:none}
+                .bp-mobile-search{margin:0 0 12px}
+                .bp-mobile-search input{width:100%;background:var(--bs-body-bg);color:var(--bs-body-color);border:1px solid var(--bs-border-color);border-radius:10px;padding:10px 12px}
+                .bp-mobile-card{border:1px solid var(--bs-border-color);background:var(--bs-tertiary-bg);border-radius:13px;padding:13px;margin-bottom:10px;min-width:0}
+                .bp-mobile-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--bs-border-color);margin-bottom:10px}
+                .bp-mobile-card-title{font-weight:750;font-size:.95rem;line-height:1.35;overflow-wrap:anywhere}
+                .bp-mobile-card-sub{font-size:.75rem;color:var(--bs-secondary-color);margin-top:3px;overflow-wrap:anywhere}
+                .bp-mobile-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+                .bp-mobile-metric{background:var(--bs-body-bg);border-radius:9px;padding:9px;min-width:0}
+                .bp-mobile-metric-label{font-size:.69rem;color:var(--bs-secondary-color);line-height:1.25;margin-bottom:4px}
+                .bp-mobile-metric-value{font-size:1rem;font-weight:750;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+                .bp-mobile-status{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+                .bp-mobile-status span{font-size:.7rem;padding:4px 7px;border-radius:7px;background:var(--bs-body-bg);border:1px solid var(--bs-border-color);font-variant-numeric:tabular-nums}
+                .bp-mobile-empty{text-align:center;color:var(--bs-secondary-color);padding:18px}
+                .bp-mobile-pager{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 2px;padding-top:10px;border-top:1px solid var(--bs-border-color);font-size:.78rem;color:var(--bs-secondary-color)}
+                .bp-mobile-pager .btn{min-width:104px}
+                .bp-data-table{display:block;width:100%;max-width:100%;min-width:0}
+                .bp-data-table .tabulator{width:100%;max-width:100%;box-sizing:border-box}
+                .bp-data-table .tabulator-header,.bp-data-table .tabulator-tableholder{width:100%}.bp-data-table .tabulator-cell,.bp-data-table .tabulator-col-title{white-space:normal;overflow-wrap:anywhere;font-size:12px}
+                @media(max-width:767.98px){.bp-data-table{display:block;width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}.bp-data-table .tabulator{min-width:1050px}.bp-data-table .tabulator-tableholder{overflow-x:auto!important}.bp-data-table .tabulator-cell,.bp-data-table .tabulator-col-title{font-size:12px}.chart-card{padding:14px!important}.chart-title{line-height:1.3}}
+            </style>
+            <div class="row g-3 mb-4">
+                <div class="col-xl-6"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-people-fill"></i></div><div><div class="chart-title mb-0">Keberadaan Keluarga</div><div class="bp-breakdown-subtitle">Distribusi hasil pada kolom <code>ada_keluarga_label</code></div></div></div><div id="businessFamilyChart" style="min-height:245px"></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Kategori</th><th class="text-end">Jumlah</th><th class="text-end">% Assignment</th></tr></thead><tbody id="businessFamilyRows"></tbody></table></div></div></div>
+                <div class="col-xl-6"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-shop"></i></div><div><div class="chart-title mb-0">Keberadaan Usaha</div><div class="bp-breakdown-subtitle">Distribusi hasil pada kolom <code>ada_bang_usaha_label</code></div></div></div><div id="businessBusinessChart" style="min-height:245px"></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Kategori</th><th class="text-end">Jumlah</th><th class="text-end">% Assignment</th></tr></thead><tbody id="businessBusinessRows"></tbody></table></div></div></div>
+            </div>
+            <div class="chart-card mt-5 mb-4"><div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2"><div class="chart-title m-0">Rekapitulasi Assignment & Petugas per Sub-SLS</div><button class="btn btn-sm btn-success" id="btnBusinessExport"><i class="bi bi-file-earmark-excel me-1"></i>Export Excel</button></div><div class="small text-secondary mb-3">Satu baris untuk setiap assignment pada file Excel. Nama PPL dan PML dicocokkan otomatis berdasarkan ID Sub-SLS (regionCode). URL membuka assignment di FASIH.</div><div id="businessRegionTable" class="bp-data-table"></div></div>
+        </section>
 
             </div>
 
@@ -1572,6 +1672,7 @@
             <script src="js/table.js"></script>
             <script src="js/comparison.js"></script>
             <script src="js/app.js"></script>
+            <script src="js/business/business_app.js"></script>
 
 </body>
 
