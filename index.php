@@ -1446,6 +1446,20 @@
             </div>
         </div>
 
+        <section id="scheduleProgressAlert" class="schedule-progress-alert mb-4" aria-live="polite" aria-atomic="true">
+            <div class="schedule-progress-head">
+                <div class="schedule-progress-title"><i class="bi bi-calendar2-check"></i> Evaluasi Progres Pendataan</div>
+                <span id="scheduleProgressStatus" class="schedule-progress-status">Menghitung progres...</span>
+            </div>
+            <div class="schedule-progress-grid">
+                <div><div class="schedule-progress-label">Target progres</div><div class="schedule-progress-value schedule-target-value" id="scheduleTargetValue">—</div></div>
+                <div><div class="schedule-progress-label">Progres aktual</div><div class="schedule-progress-value schedule-actual-value" id="scheduleActualValue">—</div></div>
+                <div><div class="schedule-progress-label">Selisih</div><div class="schedule-progress-value" id="scheduleGapValue">—</div></div>
+            </div>
+            <div class="schedule-progress-track"><div id="scheduleProgressBar" class="schedule-progress-fill" style="width:0%"></div></div>
+            <div class="schedule-progress-foot" id="scheduleProgressNote">Periode pendataan 1–30 November 2026</div>
+        </section>
+
         <div class="row g-4">
             <?php
             $cards = [
@@ -1759,7 +1773,29 @@
                 .bp-data-table .tabulator{width:100%;max-width:100%;box-sizing:border-box}
                 .bp-data-table .tabulator-header,.bp-data-table .tabulator-tableholder{width:100%}.bp-data-table .tabulator-cell,.bp-data-table .tabulator-col-title{white-space:normal;overflow-wrap:anywhere;font-size:12px}
                 @media(max-width:767.98px){.bp-data-table{display:block;width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}.bp-data-table .tabulator{min-width:1050px}.bp-data-table .tabulator-tableholder{overflow-x:auto!important}.bp-data-table .tabulator-cell,.bp-data-table .tabulator-col-title{font-size:12px}.chart-card{padding:14px!important}.chart-title{line-height:1.3}}
-            </style>
+            
+        /* Evaluasi progres terhadap kalender pendataan */
+        .schedule-progress-alert{--sp-accent:#2563eb;--sp-bg:rgba(37,99,235,.09);border:1px solid var(--bs-border-color);border-left:4px solid var(--sp-accent);border-radius:16px;padding:17px 20px;background:var(--bs-tertiary-bg);color:var(--bs-body-color);box-shadow:0 5px 18px rgba(15,23,42,.06);transition:background .2s ease,border-color .2s ease,color .2s ease}
+        .schedule-progress-alert.status-good{--sp-accent:#16a34a;--sp-bg:rgba(22,163,74,.08)}
+        .schedule-progress-alert.status-near{--sp-accent:#d97706;--sp-bg:rgba(217,119,6,.09)}
+        .schedule-progress-alert.status-low{--sp-accent:#dc2626;--sp-bg:rgba(220,38,38,.08)}
+        html[data-bs-theme="dark"] .schedule-progress-alert{background:linear-gradient(145deg,#111827,#0b1220);border-color:#263244;border-left-color:var(--sp-accent);color:#f3f4f6;box-shadow:0 8px 22px rgba(0,0,0,.18)}
+        html[data-bs-theme="dark"] .schedule-progress-label,html[data-bs-theme="dark"] .schedule-progress-foot{color:#94a3b8}
+        html[data-bs-theme="light"] .schedule-progress-alert{background:linear-gradient(145deg,#fff,#f8fafc);border-color:#e2e8f0;border-left-color:var(--sp-accent);color:#0f172a;box-shadow:0 5px 16px rgba(15,23,42,.06)}
+        html[data-bs-theme="light"] .schedule-progress-label,html[data-bs-theme="light"] .schedule-progress-foot{color:#64748b}
+        .schedule-progress-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+        .schedule-progress-title{font-weight:750;font-size:1rem;display:flex;align-items:center;gap:9px}
+        .schedule-progress-title i{color:var(--sp-accent);font-size:1.1rem}
+        .schedule-progress-status{font-size:.76rem;font-weight:700;color:var(--sp-accent);background:var(--sp-bg);padding:6px 10px;border-radius:999px;white-space:nowrap}
+        .schedule-progress-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}
+        .schedule-progress-label{font-size:.76rem;color:var(--bs-secondary-color);margin-bottom:3px}
+        .schedule-progress-value{font-size:1.35rem;font-weight:800;line-height:1.25;font-variant-numeric:tabular-nums}
+        .schedule-target-value{color:#3b82f6!important}.schedule-actual-value{color:#16a34a!important}
+        .schedule-progress-track{height:9px;border-radius:99px;background:rgba(148,163,184,.2);overflow:hidden}
+        .schedule-progress-fill{height:100%;border-radius:99px;background:var(--sp-accent);transition:width .35s ease}
+        .schedule-progress-foot{font-size:.76rem;color:var(--bs-secondary-color);margin-top:9px}
+        @media(max-width:575.98px){.schedule-progress-alert{padding:13px 14px}.schedule-progress-head{align-items:flex-start;flex-direction:column;gap:8px}.schedule-progress-grid{gap:7px}.schedule-progress-value{font-size:1.12rem}.schedule-progress-label{font-size:.69rem}}
+</style>
             <div class="row g-3 mb-4">
                 <div class="col-xl-6"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-people-fill"></i></div><div><div class="chart-title mb-0">Keberadaan Keluarga</div><div class="bp-breakdown-subtitle">Distribusi hasil pada kolom <code>ada_keluarga_label</code></div></div></div><div id="businessFamilyChart" style="min-height:245px"></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Kategori</th><th class="text-end">Jumlah</th><th class="text-end">% Assignment</th></tr></thead><tbody id="businessFamilyRows"></tbody></table></div></div></div>
                 <div class="col-xl-6"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-shop"></i></div><div><div class="chart-title mb-0">Keberadaan Usaha</div><div class="bp-breakdown-subtitle">Distribusi hasil pada kolom <code>ada_bang_usaha_label</code></div></div></div><div id="businessBusinessChart" style="min-height:245px"></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Kategori</th><th class="text-end">Jumlah</th><th class="text-end">% Assignment</th></tr></thead><tbody id="businessBusinessRows"></tbody></table></div></div></div>

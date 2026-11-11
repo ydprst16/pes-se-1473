@@ -165,6 +165,18 @@ async function renderAll() {
   if (typeof renderCharts === "function") renderCharts();
   if (typeof renderTable === "function") renderTable();
   if (typeof renderComparison === "function") renderComparison();
+  // Render once more after all dashboard data and role state are settled.
+  // This prevents the schedule banner from remaining in its initial loading state.
+  const summary = Dashboard && Dashboard.summary ? Dashboard.summary : {};
+  const total = Number(summary.assignment || 0);
+  let actual = Number(progressForRole(summary));
+  if (!Number.isFinite(actual) || (actual === 0 && total > 0)) {
+    const numerator = currentRole === "pengawas"
+      ? Number(summary.reviewed ?? summary.approved ?? 0)
+      : Number(summary.completed ?? 0);
+    actual = total > 0 ? numerator / total * 100 : 0;
+  }
+  renderScheduleProgress(actual, total);
 }
 
 function applySavedTheme() {
@@ -341,6 +353,65 @@ function renderCards() {
 
   const prevProg = prev ? progressForRole(prev) : null;
   renderChange("progressChange", prog, prevProg, true);
+  renderScheduleProgress(prog, s.assignment);
+}
+
+/* ========= Evaluasi progres terhadap kalender pendataan ========= */
+function renderScheduleProgress(actualProgress, assignmentTotal) {
+  const box = document.getElementById("scheduleProgressAlert");
+  if (!box) return;
+
+  const start = new Date("2026-11-01T00:00:00+07:00");
+  const end = new Date("2026-11-30T23:59:59+07:00");
+  const selected = viewedDate
+    ? new Date(`${viewedDate}T12:00:00+07:00`)
+    : new Date();
+  const selectedYmd = toYMDinJakarta(selected);
+  const startYmd = "2026-11-01";
+  const endYmd = "2026-11-30";
+  let elapsedDays = 0;
+  if (selectedYmd >= startYmd) {
+    const [selectedYear, selectedMonth, selectedDay] = selectedYmd.split("-").map(Number);
+    elapsedDays = selectedYmd > endYmd ? 30 : Math.min(30, Math.max(0, Math.floor((Date.UTC(selectedYear, selectedMonth - 1, selectedDay) - Date.UTC(2026, 10, 1)) / 86400000) + 1));
+  }
+  const target = elapsedDays / 30 * 100;
+  const parsedActual = Number(actualProgress);
+  const actual = Number.isFinite(parsedActual) ? Math.max(0, parsedActual) : 0;
+  const gap = actual - target;
+  const ratio = target > 0 ? actual / target * 100 : (actual > 0 ? 100 : 0);
+
+  let statusClass = "status-good", statusText = "Sesuai target", note = "Progres pendataan telah mencapai atau melampaui target waktu.";
+  if (assignmentTotal <= 0) {
+    statusClass = "status-near"; statusText = "Data belum tersedia"; note = "Belum ada data assignment untuk menghitung progres aktual.";
+  } else if (target === 0) {
+    statusClass = "status-good"; statusText = "Periode belum dimulai"; note = "Target progres dimulai pada 1 November 2026.";
+  } else if (ratio >= 90 && ratio < 100) {
+    statusClass = "status-near"; statusText = "Mendekati target"; note = "Progres pendataan sedikit di bawah target waktu. Pertahankan percepatan.";
+  } else if (ratio < 90) {
+    statusClass = "status-low"; statusText = "Perlu percepatan"; note = "Progres pendataan masih tertinggal dari target waktu. Perlu percepatan penyelesaian assignment.";
+  }
+
+  box.classList.remove("status-good", "status-near", "status-low");
+  box.classList.add(statusClass);
+  const targetEl = document.getElementById("scheduleTargetValue");
+  const actualEl = document.getElementById("scheduleActualValue");
+  const gapEl = document.getElementById("scheduleGapValue");
+  const statusEl = document.getElementById("scheduleProgressStatus");
+  const bar = document.getElementById("scheduleProgressBar");
+  const noteEl = document.getElementById("scheduleProgressNote");
+  if (targetEl) targetEl.textContent = target.toFixed(1) + "%";
+  if (actualEl) actualEl.textContent = actual.toFixed(1) + "%";
+  if (gapEl) {
+    const abs = Math.abs(gap).toFixed(1);
+    gapEl.textContent = (gap > 0 ? "+" : gap < 0 ? "−" : "") + abs + " pp";
+    gapEl.style.color = gap < -0.05 ? "var(--sp-accent)" : "#16a34a";
+  }
+  if (statusEl) statusEl.textContent = statusText;
+  if (bar) { bar.style.width = Math.min(100, actual) + "%"; bar.style.background = "#16a34a"; }
+  if (noteEl) {
+    const dateLabel = selectedYmd < startYmd ? "Periode 1–30 November 2026" : selectedYmd > endYmd ? "Akhir periode: 30 November 2026" : `Hari ke-${elapsedDays} dari 30 · ${formatDateID(selected).split(" ").slice(0,3).join(" ")}`;
+    noteEl.textContent = `${dateLabel}. ${note}`;
+  }
 }
 
 function applyBacklogColor(count) {
