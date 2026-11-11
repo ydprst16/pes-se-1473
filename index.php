@@ -1256,6 +1256,8 @@
             display:flex; align-items:center; gap:clamp(1.25rem, 3vw, 2.25rem);
             border-bottom:1px solid var(--border); margin:0 0 1.5rem; padding:0 .15rem;
             overflow-x:auto; scrollbar-width:thin;
+            position:sticky; top:var(--app-header-height, 0px); z-index:998;
+            background:var(--card-solid); box-shadow:0 8px 16px rgba(0,0,0,.08);
         }
         .module-navigation .module-tab {
             appearance:none; border:0; border-bottom:3px solid transparent; background:transparent;
@@ -1650,12 +1652,14 @@
                 <select class="form-select form-select-sm" id="businessHistorySelect" style="max-width:190px"><option value="">Data terbaru</option></select>
             </div>
             <div class="row g-3 mb-4" id="businessKpis">
-                <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card h-100"><div class="kpi-title">Total Assignment</div><div class="kpi-value" id="bpTotal">-</div><div class="small text-secondary">Jumlah seluruh baris Excel</div></div></div>
-                <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card h-100"><div class="kpi-title">Assignment Keluarga Terisi</div><div class="kpi-value" id="bpFamilyFilled">-</div><div class="small text-secondary">Kolom ada_keluarga_label</div></div></div>
-                <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card h-100"><div class="kpi-title">Assignment Usaha Terisi</div><div class="kpi-value" id="bpBusinessFilled">-</div><div class="small text-secondary">Kolom ada_bang_usaha_label</div></div></div>
-                <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card h-100"><div class="kpi-title">Persentase Isian Gabungan</div><div class="kpi-value" id="bpCombinedPercent">-</div><div class="small text-secondary" id="bpCombinedDetail">Assignment dengan minimal satu isian</div></div></div>
+                <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card h-100"><div class="kpi-title">Total Assignment</div><div class="kpi-value" id="bpTotal">-</div><div class="small text-secondary">Jumlah seluruh baris Excel</div><div class="bp-kpi-change" id="bpTotalChange">—</div></div></div>
+                <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card h-100"><div class="kpi-title">Assignment Keluarga Terisi</div><div class="kpi-value" id="bpFamilyFilled">-</div><div class="small text-secondary">Kolom ada_keluarga_label</div><div class="bp-kpi-change" id="bpFamilyChange">—</div></div></div>
+                <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card h-100"><div class="kpi-title">Assignment Usaha Terisi</div><div class="kpi-value" id="bpBusinessFilled">-</div><div class="small text-secondary">Kolom ada_bang_usaha_label</div><div class="bp-kpi-change" id="bpBusinessChange">—</div></div></div>
+                <div class="col-12 col-sm-6 col-xl-3"><div class="kpi-card h-100"><div class="kpi-title">Persentase Isian Gabungan</div><div class="kpi-value" id="bpCombinedPercent">-</div><div class="small text-secondary" id="bpCombinedDetail">Assignment dengan minimal satu isian</div><div class="bp-kpi-change" id="bpCombinedChange">—</div></div></div>
             </div>
             <style>
+                .bp-kpi-change{display:inline-flex;align-items:center;gap:.3rem;margin-top:.55rem;font-size:.78rem;font-weight:700;color:#9ca3af;line-height:1.25;flex-wrap:wrap}
+                .bp-kpi-change small{font-size:.68rem;font-weight:500;color:var(--text-mute)}
                 .bp-breakdown-card{border:1px solid var(--bs-border-color);border-radius:14px;background:var(--bs-body-bg);padding:1.1rem;height:100%;}
                 .bp-breakdown-head{display:flex;align-items:center;gap:.7rem;margin-bottom:.85rem;}
                 .bp-breakdown-icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(13,110,253,.09);color:var(--bs-primary);font-size:1.05rem;flex:0 0 auto;}
@@ -1698,6 +1702,16 @@
 
             </div>
 
+            <script>
+                (() => {
+                    const header = document.querySelector('.header');
+                    if (!header) return;
+                    const updateHeaderHeight = () => document.documentElement.style.setProperty('--app-header-height', `${Math.ceil(header.getBoundingClientRect().height)}px`);
+                    updateHeaderHeight();
+                    if ('ResizeObserver' in window) new ResizeObserver(updateHeaderHeight).observe(header);
+                    window.addEventListener('resize', updateHeaderHeight, {passive:true});
+                })();
+            </script>
             <!-- Bootstrap -->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
             <!-- SheetJS -->
