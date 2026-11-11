@@ -1271,6 +1271,47 @@
             .module-navigation { gap:1.25rem; margin-bottom:1.1rem; }
             .module-navigation .module-tab { font-size:.82rem; padding:.75rem .1rem .68rem; }
         }
+
+        /* Mobile chart layout hardening (v19) */
+        .chart-card { min-width: 0; }
+        .chart-body { min-width: 0; width: 100%; display: block; }
+        .chart-box { min-width: 0; max-width: 100%; width: 100%; overflow: hidden; }
+        .chart-box .apexcharts-canvas,
+        .chart-box .apexcharts-svg { max-width: 100% !important; }
+        .performer-item { min-width: 0; gap: 10px; flex-wrap: wrap; }
+        .performer-item > div { min-width: 0; flex: 1 1 210px; overflow-wrap: anywhere; }
+        .performer-item > span { flex: 0 0 auto; white-space: nowrap; }
+
+        @media (max-width: 768px) {
+            .chart-card, .chart-card.equal-height {
+                height: auto !important;
+                min-height: 0 !important;
+                width: 100%;
+                min-width: 0;
+                overflow: visible;
+                transform: none !important;
+            }
+            .chart-card:hover, .chart-card:active { transform: none !important; }
+            .chart-body { flex: initial; align-items: initial; justify-content: initial; }
+            .chart-box { height: auto !important; min-height: 300px; }
+            #statusChart { min-height: 290px; }
+            #rankingChart, #districtChart { min-height: 320px; }
+            #distributionChart { min-height: 285px; }
+            .chart-title { overflow-wrap: anywhere; }
+            .chart-card > .d-flex { min-width: 0; flex-wrap: wrap; gap: 8px; }
+            .performer-list { max-height: none; overflow: visible; }
+            .performer-item { align-items: flex-start !important; padding: 12px 4px !important; }
+            .performer-item small { display: block; line-height: 1.6; overflow-wrap: anywhere; }
+            .performer-item .badge { margin-left: auto; }
+            .row > [class*="col-"] { min-width: 0; }
+        }
+        @media (max-width: 420px) {
+            .chart-card { padding: 12px !important; }
+            #statusChart { min-height: 275px; }
+            #rankingChart, #districtChart { min-height: 310px; }
+            #distributionChart { min-height: 270px; }
+            .chart-title { font-size: 13px; }
+        }
     </style>
 
 </head>
