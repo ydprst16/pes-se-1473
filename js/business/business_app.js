@@ -155,7 +155,7 @@
   }
   function renderBusinessChange(id,current,previous,previousDate,isPercent=false){
     const el=$(id);if(!el)return;
-    if(!previous){el.className='bp-kpi-change';el.textContent='— Belum ada snapshot sebelumnya';return;}
+    if(!previous){el.className='bp-kpi-change';el.textContent='—';el.style.color='#9ca3af';return;}
     const diff=current-previous;
     const rounded=isPercent?Number(diff.toFixed(2)):Math.round(diff);
     const zero=rounded===0,up=rounded>0;
@@ -164,7 +164,7 @@
     const symbol=zero?'▬':(up?'▲':'▼');
     const amount=isPercent?`${Math.abs(rounded).toFixed(2).replace('.',',')} poin`:fmt(Math.abs(rounded));
     const sign=zero?'':(up?'+':'−');
-    el.innerHTML=`${symbol} ${sign}${amount} <small>vs ${escapeHtml(previousDate||'snapshot sebelumnya')}</small>`;
+    el.textContent=`${symbol} ${sign}${amount}`;
   }
   async function updateBusinessKpiComparison(payload){
     const currentDate=String(payload?.importDate||'');

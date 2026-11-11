@@ -449,6 +449,73 @@
             color: var(--text-mute) !important;
         }
 
+        /* Tabulator light theme: force readable white surfaces and dark text
+           for both Monitoring Petugas and Keberadaan Keluarga/Usaha tables. */
+        [data-bs-theme="light"] #gridTable .tabulator,
+        [data-bs-theme="light"] #gridTableDetail .tabulator,
+        [data-bs-theme="light"] #businessRegionTable .tabulator {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #dbe3ee !important;
+        }
+        [data-bs-theme="light"] #gridTable .tabulator-header,
+        [data-bs-theme="light"] #gridTableDetail .tabulator-header,
+        [data-bs-theme="light"] #businessRegionTable .tabulator-header,
+        [data-bs-theme="light"] #gridTable .tabulator-col,
+        [data-bs-theme="light"] #gridTableDetail .tabulator-col,
+        [data-bs-theme="light"] #businessRegionTable .tabulator-col {
+            background: #eef2f7 !important;
+            color: #0f172a !important;
+            border-color: #dbe3ee !important;
+        }
+        [data-bs-theme="light"] #gridTable .tabulator-tableholder,
+        [data-bs-theme="light"] #gridTableDetail .tabulator-tableholder,
+        [data-bs-theme="light"] #businessRegionTable .tabulator-tableholder {
+            background: #ffffff !important;
+        }
+        [data-bs-theme="light"] #gridTable .tabulator-row,
+        [data-bs-theme="light"] #gridTableDetail .tabulator-row,
+        [data-bs-theme="light"] #businessRegionTable .tabulator-row {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #e2e8f0 !important;
+        }
+        [data-bs-theme="light"] #gridTable .tabulator-row-even,
+        [data-bs-theme="light"] #gridTableDetail .tabulator-row-even,
+        [data-bs-theme="light"] #businessRegionTable .tabulator-row-even {
+            background: #f8fafc !important;
+        }
+        [data-bs-theme="light"] #gridTable .tabulator-cell,
+        [data-bs-theme="light"] #gridTableDetail .tabulator-cell,
+        [data-bs-theme="light"] #businessRegionTable .tabulator-cell,
+        [data-bs-theme="light"] #gridTable .tabulator-col-title,
+        [data-bs-theme="light"] #gridTableDetail .tabulator-col-title,
+        [data-bs-theme="light"] #businessRegionTable .tabulator-col-title {
+            color: #0f172a !important;
+            background: transparent !important;
+            border-color: #e2e8f0 !important;
+        }
+        [data-bs-theme="light"] #gridTable .tabulator-footer,
+        [data-bs-theme="light"] #gridTableDetail .tabulator-footer,
+        [data-bs-theme="light"] #businessRegionTable .tabulator-footer,
+        [data-bs-theme="light"] #gridTable .tabulator-page,
+        [data-bs-theme="light"] #gridTableDetail .tabulator-page,
+        [data-bs-theme="light"] #businessRegionTable .tabulator-page,
+        [data-bs-theme="light"] #gridTable .tabulator-page-size,
+        [data-bs-theme="light"] #gridTableDetail .tabulator-page-size,
+        [data-bs-theme="light"] #businessRegionTable .tabulator-page-size {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        [data-bs-theme="light"] #gridTable .tabulator-header-filter input,
+        [data-bs-theme="light"] #gridTableDetail .tabulator-header-filter input,
+        [data-bs-theme="light"] #businessRegionTable .tabulator-header-filter input {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+
         .performer-list .border-bottom {
             border-color: var(--border) !important;
         }
@@ -1644,7 +1711,7 @@
 
         <section id="businessPresenceModule" class="d-none">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-                <div><h3 class="mb-1"><i class="bi bi-people-fill text-primary me-2"></i>Keberadaan Keluarga/Usaha</h3><div class="text-secondary small">Monitoring keberadaan keluarga, keberadaan usaha, dan status pendataan berdasarkan file Excel harian.</div></div>
+                <div><h3 class="mb-1"><i class="bi bi-people-fill text-primary me-2"></i>Keberadaan Keluarga/Usaha</h3><div class="text-secondary small">Monitoring keberadaan keluarga, keberadaan usaha, dan status pendataan.</div></div>
                 <div class="d-flex gap-2"><button class="btn btn-outline-secondary" id="btnBusinessRefresh"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button><button class="btn btn-primary" id="btnOpenBusinessUpload"><i class="bi bi-upload me-1"></i>Upload Excel</button></div>
             </div>
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
