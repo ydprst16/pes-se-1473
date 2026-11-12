@@ -81,7 +81,7 @@ try {
         if (!is_array($decoded) || !isset($decoded['records']) || !is_array($decoded['records'])) bp_fail('Format payload tidak valid.');
         $records=$decoded['records'];
         if (!$records) bp_fail('Tidak ada baris data untuk diimport.');
-        $required=['prov','kab','kec','des','sls','ssls','id','ada_keluarga_label','ada_bang_usaha_label','assignment_status_alias'];
+        $required=['prov','kab','kec','des','sls','ssls','id','ada_keluarga_label','ada_bang_usaha_label','keberadaan_usaha_label','assignment_status_alias'];
         $seenBusinessKeys=[]; $duplicateBusinessCandidates=0; $valid=[]; $invalid=[];
         foreach ($records as $i=>$r) {
             $missing=[]; foreach ($required as $k) if (!array_key_exists($k,$r)) $missing[]=$k;
@@ -103,6 +103,7 @@ try {
             $r['id']= $id; foreach ($codes as $k=>$v) $r[$k]=$v;
             $r['idsubsls']=$idsubsls;
             $r['ada_bang_usaha_label']=trim((string)($r['ada_bang_usaha_label'] ?? ''));
+            $r['keberadaan_usaha_label']=trim((string)($r['keberadaan_usaha_label'] ?? ''));
             $valid[]=$r;
         }
         if ($invalid) bp_fail('Import dibatalkan: terdapat '.count($invalid).' baris tidak valid. Tidak ada data yang disimpan agar total assignment tetap sama dengan jumlah baris Excel. Contoh: '.($invalid[0]['reason'] ?? 'Periksa file Excel.'));
