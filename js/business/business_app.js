@@ -49,7 +49,7 @@
   }
   function normalizeRecord(raw) {
     const r=normalizeHeader(raw), rec={};
-    ['prov','kab','kec','des','sls','ssls','nama','alamat','ada_keluarga_label','ada_bang_usaha_label','url','is_assignment_tambahan','assignment_status_alias','date_modified','id']
+    ['prov','kab','kec','des','sls','ssls','nama','nama_usaha','alamat','ada_keluarga_label','ada_bang_usaha_label','url','is_assignment_tambahan','assignment_status_alias','date_modified','id']
       .forEach(k=>rec[k]=cell(r[k]));
     rec.idsubsls=idSubsls(rec);
     return rec;
@@ -65,26 +65,34 @@
     const requiredHeaders=['prov','kab','kec','des','sls','ssls','id','ada_keluarga_label','ada_bang_usaha_label','assignment_status_alias'];
     const missingHeaders=requiredHeaders.filter(x=>!headers.includes(x));
     if (missingHeaders.length) throw new Error('Kolom wajib tidak ditemukan: '+missingHeaders.join(', '));
-    const rows=raw.map(normalizeRecord), valid=[], errors=[], seen=new Set();
+    const rows=raw.map(normalizeRecord), valid=[], errors=[], warnings=[], seenBusinessKeys=new Map();
     rows.forEach((r,i)=>{
       const missing=['prov','kab','kec','des','sls','ssls','id'].filter(k=>!r[k]);
       if(missing.length){errors.push(`Baris ${i+2}: data identitas kosong (${missing.join(', ')})`);return;}
       if(!/^\d{16}$/.test(r.idsubsls)){errors.push(`Baris ${i+2}: idsubsls tidak valid (${r.idsubsls})`);return;}
-      if(seen.has(r.id)){errors.push(`Baris ${i+2}: UUID assignment duplikat (${r.id})`);return;}
-      seen.add(r.id); valid.push(r);
+      // UUID assignment boleh berulang karena satu keluarga dapat memiliki banyak usaha.
+      // Kombinasi UUID + nama usaha hanya ditandai sebagai kandidat duplikasi; tidak ditolak.
+      const businessName=cell(r.nama_usaha).toLocaleLowerCase('id-ID').replace(/\s+/g,' ').trim();
+      if(businessName){
+        const businessKey=r.id+'::'+businessName;
+        if(seenBusinessKeys.has(businessKey)) warnings.push(`Baris ${i+2}: kandidat catatan usaha berulang untuk UUID ${r.id} dengan nama usaha "${r.nama_usaha}" (pertama pada baris ${seenBusinessKeys.get(businessKey)})`);
+        else seenBusinessKeys.set(businessKey,i+2);
+      }
+      valid.push(r);
     });
-    return {rows,valid,errors,sheetName:wb.SheetNames[0]};
+    return {rows,valid,errors,warnings,sheetName:wb.SheetNames[0]};
   }
 
   function setPreview(parsed,file) {
     const f={},b={},s={};
     parsed.valid.forEach(r=>{const a=familyOf(r.ada_keluarga_label),z=businessOf(r.ada_bang_usaha_label),t=r.assignment_status_alias||'Status Kosong';f[a]=(f[a]||0)+1;b[z]=(b[z]||0)+1;s[t]=(s[t]||0)+1;});
     const pills=(obj)=>Object.entries(obj).map(([k,v])=>`<span class="badge bg-secondary">${escapeHtml(k)}: ${fmt(v)}</span>`).join(' ');
-    $('businessImportPreview').innerHTML=`<div class="alert alert-light border mb-2"><strong>${escapeHtml(file.name)}</strong><br>Sheet: ${escapeHtml(parsed.sheetName)} · Total baris Excel: <b>${fmt(parsed.rows.length)}</b> · Valid: <b class="text-success">${fmt(parsed.valid.length)}</b> · Bermasalah: <b class="text-danger">${fmt(parsed.errors.length)}</b></div>
+    $('businessImportPreview').innerHTML=`<div class="alert alert-light border mb-2"><strong>${escapeHtml(file.name)}</strong><br>Sheet: ${escapeHtml(parsed.sheetName)} · Total baris Excel: <b>${fmt(parsed.rows.length)}</b> · Valid: <b class="text-success">${fmt(parsed.valid.length)}</b> · Bermasalah: <b class="text-danger">${fmt(parsed.errors.length)}</b> · Peringatan kandidat duplikat: <b class="text-warning">${fmt(parsed.warnings.length)}</b></div>
       <div class="mb-2"><b>Keberadaan Keluarga</b><div class="d-flex flex-wrap gap-1 mt-1">${pills(f)}</div></div>
       <div class="mb-2"><b>Keberadaan Usaha</b><div class="d-flex flex-wrap gap-1 mt-1">${pills(b)}</div></div>
       <div class="mb-2"><b>Status Pendataan</b><div class="d-flex flex-wrap gap-1 mt-1">${pills(s)}</div></div>
-      ${parsed.errors.length?`<details class="text-danger"><summary>Lihat ${parsed.errors.length} baris bermasalah</summary><ul class="mt-2">${parsed.errors.slice(0,30).map(e=>`<li>${escapeHtml(e)}</li>`).join('')}</ul></details>`:'<span class="text-success"><i class="bi bi-check-circle"></i> Seluruh baris lolos validasi. Kolom hasil yang kosong tetap dihitung sebagai belum diisi.</span>'}`;
+      ${parsed.errors.length?`<details class="text-danger"><summary>Lihat ${parsed.errors.length} baris bermasalah</summary><ul class="mt-2">${parsed.errors.slice(0,30).map(e=>`<li>${escapeHtml(e)}</li>`).join('')}</ul></details>`:'<span class="text-success"><i class="bi bi-check-circle"></i> Seluruh baris lolos validasi wajib.</span>'}
+      ${parsed.warnings.length?`<details class="text-warning mt-2"><summary>Lihat ${parsed.warnings.length} kandidat catatan usaha berulang (tetap diimpor)</summary><ul class="mt-2">${parsed.warnings.slice(0,30).map(e=>`<li>${escapeHtml(e)}</li>`).join('')}</ul></details>`:''}`;
   }
 
   async function handleFileChange() {
@@ -277,7 +285,7 @@
       const villageName=wilayahRef.nmdesa || r.des || '-';
       return {
         rowNumber:index+1, idsubsls:code, kec:districtName,des:villageName,sls:r.sls||'',ssls:r.ssls||'',
-        nama:r.nama||'',url,
+        nama:[r.nama,r.nama_usaha].filter(Boolean).join(' / '),url,
         pplNames:[...names.ppl].join(', ')||'-',
         pmlNames:[...names.pml].join(', ')||'-',
         family:familyOf(r.ada_keluarga_label),business:businessOf(r.ada_bang_usaha_label),
