@@ -117,6 +117,11 @@ function renderSe2026WorkloadComparison() {
         { title: "Pencapaian", field: "achievement", hozAlign: "right", headerHozAlign: "center", minWidth: 100, widthGrow: 1, formatter: cell => { const v=Number(cell.getValue())||0; const level=v>=100?"complete":v>=50?"progress":"low"; return `<span class="se2026-achievement-pill se2026-achievement-${level}">${v.toFixed(1).replace(".",",")}%</span>`; } },
       ],
     });
+    // Enforce default ordering after Tabulator has initialized its data model.
+    // Lowest achievement = largest remaining workload, so it appears first.
+    se2026WorkloadTabulator.on("tableBuilt", function () {
+      se2026WorkloadTabulator.setSort("achievement", "asc");
+    });
   }
 
   const el=document.getElementById("se2026WorkloadChart");
@@ -153,7 +158,9 @@ function exportSe2026WorkloadExcel() {
     alert("Library Excel belum tersedia. Silakan muat ulang halaman.");
     return;
   }
-  const exportRows = se2026WorkloadRows.map(row => ({
+  const exportRows = [...se2026WorkloadRows]
+    .sort((a, b) => a.achievement - b.achievement || a.name.localeCompare(b.name, "id"))
+    .map(row => ({
     "Petugas": row.name,
     "Muatan SE2026": row.target,
     "Assignment PES 2026": row.actual,
