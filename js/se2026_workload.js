@@ -88,7 +88,7 @@ function renderSe2026WorkloadComparison() {
     const gap = actual - target;
     const dailyTarget = se2026DailyTarget(target, actual, remainingDays);
     return { name: se2026DisplayName(officer.name), target, actual, gap, dailyTarget, remainingDays, achievement: target > 0 ? actual / target * 100 : 0, matched: actualByName.has(key) };
-  }).sort((a,b) => a.achievement - b.achievement || a.name.localeCompare(b.name, "id"));
+  }).sort((a,b) => a.gap - b.gap || a.achievement - b.achievement || a.name.localeCompare(b.name, "id"));
 
   // Keep the complete, unpaginated comparison dataset available for Excel export.
   se2026WorkloadRows = rows.map(row => ({ ...row }));
@@ -105,7 +105,7 @@ function renderSe2026WorkloadComparison() {
       resizableColumns: true,
       pagination: true,
       paginationSize: 15,
-      initialSort: [{ column: "achievement", dir: "asc" }],
+      initialSort: [{ column: "gap", dir: "asc" }, { column: "achievement", dir: "asc" }],
       paginationSizeSelector: [15, 25, 50],
       placeholder: "Tidak ada data perbandingan",
       columns: [
@@ -116,11 +116,6 @@ function renderSe2026WorkloadComparison() {
         { title: "Target Pendataan Harian", field: "dailyTarget", hozAlign: "right", headerHozAlign: "center", minWidth: 145, widthGrow: 1, formatter: cell => cell.getValue() == null ? "—" : `<span class="se2026-daily-pill">${se2026Number(cell.getValue())}</span>` },
         { title: "Pencapaian", field: "achievement", hozAlign: "right", headerHozAlign: "center", minWidth: 100, widthGrow: 1, formatter: cell => { const v=Number(cell.getValue())||0; const level=v>=100?"complete":v>=50?"progress":"low"; return `<span class="se2026-achievement-pill se2026-achievement-${level}">${v.toFixed(1).replace(".",",")}%</span>`; } },
       ],
-    });
-    // Enforce default ordering after Tabulator has initialized its data model.
-    // Lowest achievement = largest remaining workload, so it appears first.
-    se2026WorkloadTabulator.on("tableBuilt", function () {
-      se2026WorkloadTabulator.setSort("achievement", "asc");
     });
   }
 
@@ -159,7 +154,7 @@ function exportSe2026WorkloadExcel() {
     return;
   }
   const exportRows = [...se2026WorkloadRows]
-    .sort((a, b) => a.achievement - b.achievement || a.name.localeCompare(b.name, "id"))
+    .sort((a, b) => a.gap - b.gap || a.achievement - b.achievement || a.name.localeCompare(b.name, "id"))
     .map(row => ({
     "Petugas": row.name,
     "Muatan SE2026": row.target,
