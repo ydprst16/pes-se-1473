@@ -30,7 +30,7 @@ const KPI_CONFIG = {
       { id: "open", title: "Open" },
       { id: "draft", title: "Draft" },
       { id: "submitted", title: "Submitted" },
-      { id: "approved", title: "Approved" },
+      { id: "completedByPengawas", title: "Complete" },
       { id: "rejected", title: "Rejected" },
       { id: "revoke", title: "Revoke" },
       { id: "progress", title: "Progress" },
@@ -45,7 +45,7 @@ const KPI_CONFIG = {
       { id: "open", title: "Open" },
       { id: "draft", title: "Draft" },
       { id: "submitted", title: "Backlog Approval", backlogColor: true },
-      { id: "approved", title: "Approved" },
+      { id: "completedByPengawas", title: "Complete" },
       { id: "rejected", title: "Rejected" },
       { id: "revoke", title: "Revoke" },
       { id: "progress", title: "Progress Review" },   // ← ganti label
@@ -334,7 +334,7 @@ function renderCards() {
   setText("open", formatNumber(s.open));
   setText("draft", formatNumber(s.draft));
   setText("submitted", formatNumber(s.submitted));
-  setText("approved", formatNumber(s.approved));
+  setText("completedByPengawas", formatNumber(s.completedByPengawas));
   setText("rejected", formatNumber(s.rejected));
   setText("revoke", formatNumber(s.revoked));
 
@@ -348,7 +348,13 @@ function renderCards() {
   renderChange("openChange",       s.open,       prev ? prev.open : null);
   renderChange("draftChange",      s.draft,      prev ? prev.draft : null);
   renderChange("submittedChange",  s.submitted,  prev ? prev.submitted : null);
-  renderChange("approvedChange",   s.approved,   prev ? prev.approved : null);
+  // KPI "Complete" menggunakan bucket completedByPengawas, bukan approved.
+  // Elemen delta-nya dibuat dari ID completedByPengawasChange di index.php.
+  renderChange(
+    "completedByPengawasChange",
+    s.completedByPengawas,
+    prev ? prev.completedByPengawas : null
+  );
   renderChange("rejectedChange",   s.rejected,   prev ? prev.rejected : null);
   renderChange("revokeChange",     s.revoked,    prev ? prev.revoked : null);
 
@@ -681,7 +687,7 @@ function resetUploadModal() {
   const fi = document.getElementById("jsonFile");
   if (fi) fi.value = "";
   const btn = document.getElementById("btnUpload");
-  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-cloud-arrow-up"></i> Upload Semua'; }
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-cloud-arrow-up"></i> Upload JSON Terpilih'; }
   const dz = document.getElementById("dropZone");
   if (dz) dz.classList.remove("is-dragover");
 }
@@ -925,7 +931,7 @@ async function handleUploadAll() {
   const skipped = uploader.items.filter(it => it.status === "invalid");
 
   btn.disabled = false;
-  btn.innerHTML = '<i class="bi bi-cloud-arrow-up"></i> Upload Semua';
+  btn.innerHTML = '<i class="bi bi-cloud-arrow-up"></i> Upload JSON Terpilih';
 
   // Deteksi rate limit / password salah
   const wrongPw = fail.find(x => (x.error || "").toLowerCase().includes("password"));
@@ -978,19 +984,17 @@ async function handleUploadAll() {
       <div><i class="bi bi-x-circle-fill text-danger"></i> Gagal: <b>${fail.length}</b></div>
       ${skipped.length ? `<div><i class="bi bi-exclamation-triangle-fill text-warning"></i> Invalid (skip): <b>${skipped.length}</b></div>` : ""}
     </div>`;
-  Swal.fire({
-    icon: fail.length && !done.length ? "error" : (fail.length ? "warning" : "success"),
-    title: fail.length && !done.length ? "Semua upload gagal"
-          : fail.length ? "Upload sebagian sukses"
-          : "Upload berhasil",
-    html,
-    confirmButtonText: "OK",
-  }).then(() => {
-    if (done.length && !fail.length && !skipped.length) {
-      const modalEl = document.getElementById("uploadModal");
-      const modal = bootstrap.Modal.getInstance(modalEl);
-      if (modal) modal.hide();
-      resetUploadModal();
-    }
-  });
+  if (done.length && !fail.length && !skipped.length) {
+    const modalEl = document.getElementById("uploadModal");
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
+    resetUploadModal();
+    Swal.fire({toast:true,position:"top-end",icon:"success",title:"Upload JSON berhasil",html,showConfirmButton:false,timer:2800,timerProgressBar:true});
+  } else {
+    Swal.fire({
+      icon: fail.length && !done.length ? "error" : "warning",
+      title: fail.length && !done.length ? "Semua upload gagal" : "Upload sebagian sukses",
+      html, confirmButtonText:"OK"
+    });
+  }
 }

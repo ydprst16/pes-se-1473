@@ -3,7 +3,6 @@
   const $ = (id) => document.getElementById(id);
   let currentPayload = null;
   let currentRows = [];
-  let charts = {};
   let regionTable = null;
   let officerRole = 'pencacah';
 
@@ -33,15 +32,28 @@
 
   function switchModule(which) {
     const monitoring = which === 'monitoring';
+    const business = which === 'business';
+    const deployment = which === 'deployment';
+    const targetRealization = which === 'target-realization';
     $('monitoringModule').classList.toggle('d-none', !monitoring);
-    $('businessPresenceModule').classList.toggle('d-none', monitoring);
-    $('menuMonitoring').classList.toggle('active', monitoring);
-    $('menuBusinessPresence').classList.toggle('active', !monitoring);
-    $('menuMonitoring').setAttribute('aria-selected', monitoring ? 'true' : 'false');
-    $('menuBusinessPresence').setAttribute('aria-selected', monitoring ? 'false' : 'true');
-    $('menuMonitoring').tabIndex = monitoring ? 0 : -1;
-    $('menuBusinessPresence').tabIndex = monitoring ? -1 : 0;
-    if (!monitoring && !currentPayload) { loadLatest(); loadHistory(); }
+    $('targetRealizationModule')?.classList.toggle('d-none', !targetRealization);
+    $('businessPresenceModule').classList.toggle('d-none', !business);
+    $('deploymentModule')?.classList.toggle('d-none', !deployment);
+    const tabs = [['menuMonitoring',monitoring],['menuBusinessPresence',business],['menuDeployment',deployment],['menuTargetRealization',targetRealization]];
+    tabs.forEach(([id,active])=>{
+      const el=$(id); if(!el) return;
+      el.classList.toggle('active',active);
+      el.setAttribute('aria-selected',active?'true':'false');
+      el.tabIndex=active?0:-1;
+    });
+    if (business && !currentPayload) { loadLatest(); loadHistory(); }
+    if (deployment && typeof window.selectDeploymentCategory === 'function') window.selectDeploymentCategory();
+    if (targetRealization) {
+      requestAnimationFrame(() => {
+        if (typeof window.refreshSe2026WorkloadComparison === 'function') window.refreshSe2026WorkloadComparison();
+        window.dispatchEvent(new Event('resize'));
+      });
+    }
   }
 
   function normalizeHeader(row) {
@@ -211,11 +223,6 @@
     }
   }
 
-  function renderDonut(elementId,key,counts,order){
-    if(charts[key])charts[key].destroy();
-    const labels=order.filter(x=>x!=='Belum Diisi' && counts[x]);
-    charts[key]=new ApexCharts($(elementId),{chart:{type:'donut',height:285,toolbar:{show:false}},labels,series:labels.map(x=>counts[x]),legend:{position:'bottom'},dataLabels:{enabled:true,formatter:(_v,opts)=>Number(opts.w.config.series[opts.seriesIndex]).toLocaleString('id-ID')},noData:{text:'Belum ada isian'}});charts[key].render();
-  }
   function summaryRows(counts,order,total){
     const rows=order.filter(name=>name!=='Belum Diisi').map(name=>({name,count:counts[name]||0})).filter(x=>x.count>0);
     if(!rows.length)return '<tr><td colspan="3" class="text-center text-secondary py-4">Belum ada hasil isian</td></tr>';
@@ -274,7 +281,6 @@
     $('businessFamilyRows').innerHTML=summaryRows(family,familyOrder,uniqueIds.size);
     $('businessFamilyBusinessRows').innerHTML=summaryRows(familyBusiness,businessOrder,Math.max(1,familyBusinessFilled));
     $('businessBkuRows').innerHTML=summaryRows(bku,businessOrder,Math.max(1,bkuFilled));
-    renderDonut('businessFamilyChart','family',family,familyOrder);renderDonut('businessFamilyBusinessChart','familyBusiness',familyBusiness,businessOrder);renderDonut('businessBkuChart','bku',bku,businessOrder);
     // Ambil seluruh petugas PPL dan PML, lalu cocokkan berdasarkan regionCode = idsubsls.
     const officerNames={};
     for (const role of ['pencacah','pengawas']) {
@@ -337,7 +343,13 @@
   function exportRegion(){if(regionTable)regionTable.download('xlsx',`rekap_keberadaan_keluarga_usaha_${currentPayload?.importDate||'latest'}.xlsx`,{sheetName:'Rekap Keluarga Usaha'});}
 
   document.addEventListener('DOMContentLoaded',()=>{
-    $('menuMonitoring')?.addEventListener('click',()=>switchModule('monitoring'));$('menuBusinessPresence')?.addEventListener('click',()=>switchModule('business'));
+    document.querySelector('.module-navigation')?.addEventListener('click',event=>{
+      const tab=event.target.closest('.module-tab');
+      if(!tab)return;
+      const routes={menuMonitoring:'monitoring',menuTargetRealization:'target-realization',menuBusinessPresence:'business',menuDeployment:'deployment'};
+      const route=routes[tab.id];
+      if(route)switchModule(route);
+    });
     $('btnOpenBusinessUpload')?.addEventListener('click',()=>{$('businessImportDate').value=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Jakarta'});bootstrap.Modal.getOrCreateInstance($('businessUploadModal')).show();});
     $('businessExcelFile')?.addEventListener('change',handleFileChange);$('btnBusinessImport')?.addEventListener('click',uploadExcel);
     $('btnBusinessRefresh')?.addEventListener('click',async()=>{await loadLatest();await loadHistory();});$('businessHistorySelect')?.addEventListener('change',e=>loadDate(e.target.value));

@@ -265,42 +265,6 @@
             border-radius: 8px;
         }
 
-        /* Workload comparison deliberately uses the shared Tabulator theme below,
-           identical to Data Enumerator (#gridTable), including light/dark surfaces. */
-
-        /* Workload comparison: balanced two-panel layout with calmer dark surfaces. */
-        #se2026WorkloadSection .se2026-workload-table-wrap { width:100%; min-width:0; }
-        #se2026WorkloadSection #se2026WorkloadTable .tabulator {
-            border:1px solid var(--border) !important;
-            border-radius:8px !important;
-            background:#172033 !important;
-            color:#e5eaf3 !important;
-            font-size:12px;
-        }
-        [data-bs-theme="dark"] #se2026WorkloadSection #se2026WorkloadTable .tabulator-header,
-        [data-bs-theme="dark"] #se2026WorkloadSection #se2026WorkloadTable .tabulator-col {
-            background:#202c40 !important; color:#e8edf5 !important; border-color:#354258 !important;
-        }
-        [data-bs-theme="dark"] #se2026WorkloadSection #se2026WorkloadTable .tabulator-tableholder { background:#172033 !important; }
-        [data-bs-theme="dark"] #se2026WorkloadSection #se2026WorkloadTable .tabulator-row { background:#1b2638 !important; color:#e5eaf3 !important; border-color:#303d52 !important; }
-        [data-bs-theme="dark"] #se2026WorkloadSection #se2026WorkloadTable .tabulator-row-even { background:#202c40 !important; }
-        [data-bs-theme="dark"] #se2026WorkloadSection #se2026WorkloadTable .tabulator-row:hover { background:#29384f !important; }
-        [data-bs-theme="dark"] #se2026WorkloadSection #se2026WorkloadTable .tabulator-cell { color:#e5eaf3 !important; border-color:#354258 !important; }
-        [data-bs-theme="dark"] #se2026WorkloadSection #se2026WorkloadTable .tabulator-footer,
-        [data-bs-theme="dark"] #se2026WorkloadSection #se2026WorkloadTable .tabulator-page,
-        [data-bs-theme="dark"] #se2026WorkloadSection #se2026WorkloadTable .tabulator-page-size { background:#172033 !important; color:#dbe4f0 !important; border-color:#354258 !important; }
-        #se2026WorkloadSection #se2026WorkloadTable .tabulator-row { min-height:34px; }
-        #se2026WorkloadSection #se2026WorkloadTable .tabulator-cell { padding:7px 8px; }
-        @media (max-width:1199.98px) {
-            #se2026WorkloadSection #se2026WorkloadChart { min-height:480px !important; }
-        }
-        @media (max-width:767.98px) {
-            #se2026WorkloadSection #se2026WorkloadChart { min-height:560px !important; }
-            #se2026WorkloadSection #se2026WorkloadTable .tabulator { min-width:0 !important; font-size:11px !important; }
-            #se2026WorkloadSection #se2026WorkloadTable .tabulator .tabulator-header .tabulator-col { min-width:0 !important; }
-            #se2026WorkloadSection #se2026WorkloadTable .tabulator-cell { padding:6px 5px !important; font-size:11px !important; }
-        }
-
         .performer-list .border-bottom {
             transition: background-color .2s ease, padding-left .2s ease;
             border-radius: 8px;
@@ -1477,7 +1441,783 @@
             #distributionChart { min-height: 270px; }
             .chart-title { font-size: 13px; }
         }
-    </style>
+    
+        /* Deployment upload: compact, balanced dashboard form */
+        .deployment-upload-card { background:var(--card-solid); border:1px solid var(--border); border-radius:14px; padding:18px; box-shadow:0 3px 14px rgba(15,23,42,.045); }
+        .deployment-upload-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:15px; }
+        .deployment-required { flex:0 0 auto; border:1px solid rgba(59,130,246,.22); background:rgba(59,130,246,.09); color:#3b82f6; border-radius:999px; padding:5px 10px; font-size:11px; font-weight:700; }
+        .deployment-file-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+        .deployment-file-item { min-width:0; padding:12px; border:1px solid var(--border); border-radius:11px; background:rgba(127,127,127,.035); }
+        .deployment-file-item.family { border-top:3px solid #3b82f6; }
+        .deployment-file-item.family-business { border-top:3px solid #0d9488; }
+        .deployment-file-item.bku { border-top:3px solid #d97706; }
+        .deployment-file-label { display:flex; align-items:center; gap:9px; margin-bottom:10px; min-width:0; }
+        .deployment-file-label > span:nth-child(2) { display:flex; flex-direction:column; min-width:0; line-height:1.3; }
+        .deployment-file-label strong { font-size:12px; }
+        .deployment-file-label small { color:var(--bs-secondary-color); font-size:10px; }
+        .deployment-file-icon { width:30px; height:30px; display:grid; place-items:center; border-radius:9px; background:rgba(127,127,127,.12); font-size:14px; }
+        .deployment-step { margin-left:auto; color:var(--bs-secondary-color); font-size:10px; font-weight:700; }
+        .deployment-file-item input { width:100%; min-width:0; font-size:11px; }
+        .deployment-upload-footer { display:flex; flex-wrap:wrap; gap:10px; align-items:end; margin-top:12px; }
+        .deployment-password { flex:0 1 220px; max-width:220px; } .deployment-history { flex:0 1 190px; max-width:190px; } .deployment-upload-button { min-height:34px; white-space:nowrap; padding-inline:13px; }
+        .deployment-upload-message { margin-top:12px; padding:8px 10px; border-radius:8px; background:rgba(127,127,127,.07); font-size:11px; }
+        .deployment-table-toolbar { display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+        .deployment-table-search { width:min(100%,320px); }
+        #deploymentOfficerTable { min-width:0; width:100%; }
+        #deploymentOfficerTable .tabulator { width:100%; background:var(--card-solid); color:var(--bs-body-color); border:1px solid var(--border); border-radius:10px; font-size:11px; }
+        #deploymentOfficerTable .tabulator-tableholder { overflow-x:auto; }
+        #deploymentOfficerTable .tabulator-header { background:var(--card-solid); color:var(--bs-body-color); border-color:var(--border); }
+        #deploymentOfficerTable .tabulator-col { background:var(--card-solid); border-color:var(--border); }
+        #deploymentOfficerTable .tabulator-col-title { white-space:normal !important; overflow-wrap:anywhere; word-break:normal; line-height:1.25; text-align:center; }
+        #deploymentOfficerTable .tabulator-header .tabulator-col:not(.tabulator-col-group) .tabulator-col-content { min-height:88px; display:flex; align-items:center; justify-content:center; padding:7px 5px; }
+        #deploymentOfficerTable .tabulator-col-group .tabulator-col-content { min-height:34px; }
+        #deploymentOfficerTable .tabulator-col-group .tabulator-col-title { font-size:11px; font-weight:800; letter-spacing:.01em; }
+        #deploymentOfficerTable .deployment-col-header { font-weight:700; }
+        #deploymentOfficerTable .deployment-col-header.deployment-col-keluarga { border-top:3px solid #3b82f6; }
+        #deploymentOfficerTable .deployment-col-header.deployment-col-usaha_keluarga { border-top:3px solid #0d9488; }
+        #deploymentOfficerTable .deployment-col-header.deployment-col-usaha_bku { border-top:3px solid #d97706; }
+        #deploymentOfficerTable .deployment-count-cell { font-variant-numeric:tabular-nums; font-weight:600; }
+        #deploymentOfficerTable .deployment-col-keluarga { background:rgba(59,130,246,.075) !important; }
+        #deploymentOfficerTable .deployment-col-usaha_keluarga { background:rgba(13,148,136,.075) !important; }
+        #deploymentOfficerTable .deployment-col-usaha_bku { background:rgba(217,119,6,.085) !important; }
+        #deploymentOfficerTable .deployment-group-keluarga { border-top:3px solid #3b82f6; }
+        #deploymentOfficerTable .deployment-group-usaha_keluarga { border-top:3px solid #0d9488; }
+        #deploymentOfficerTable .deployment-group-usaha_bku { border-top:3px solid #d97706; }
+        #deploymentOfficerTable .tabulator-row { background:var(--card-solid); color:var(--bs-body-color); border-color:var(--border); }
+        #deploymentOfficerTable .tabulator-row:nth-child(even) { background:rgba(127,127,127,.07); }
+        #deploymentOfficerTable .tabulator-cell { border-color:var(--border); padding:7px 8px; }
+        #deploymentOfficerTable .tabulator-col[tabulator-field^="keluarga_"] { background:rgba(59,130,246,.075); }
+        #deploymentOfficerTable .tabulator-col[tabulator-field^="usaha_keluarga_"] { background:rgba(13,148,136,.075); }
+        #deploymentOfficerTable .tabulator-col[tabulator-field^="usaha_bku_"] { background:rgba(217,119,6,.085); }
+        #deploymentOfficerTable .tabulator-col-group:nth-of-type(1) { border-top:3px solid #3b82f6; }
+        #deploymentOfficerTable .tabulator-col-group:nth-of-type(2) { border-top:3px solid #0d9488; }
+        #deploymentOfficerTable .tabulator-col-group:nth-of-type(3) { border-top:3px solid #d97706; }
+        [data-bs-theme="light"] #deploymentOfficerTable .tabulator-row { background:#fff; color:#1f2937; }
+        [data-bs-theme="light"] #deploymentOfficerTable .tabulator-row:nth-child(even) { background:#f8fafc; }
+        .deployment-category-tabs{display:flex;gap:7px;flex-wrap:wrap;padding:5px;border:1px solid var(--border);border-radius:12px;background:var(--card-solid)}
+        .deployment-category-tab{border:0;border-radius:8px;padding:8px 14px;background:transparent;color:var(--bs-secondary-color);font-size:12px;font-weight:700;white-space:nowrap}
+        .deployment-category-tab.active{background:var(--bs-primary);color:#fff;box-shadow:0 2px 7px rgba(0,0,0,.12)}
+        #deploymentOfficerTable .tabulator{width:max-content;min-width:100%;}
+        #deploymentOfficerTable .tabulator-tableholder{overflow-x:auto!important;overscroll-behavior-x:contain}
+        #deploymentOfficerTable .tabulator-cell.tabulator-frozen{z-index:12!important;background:#172033!important;color:#f8fafc!important;box-shadow:2px 0 5px rgba(0,0,0,.18)}
+        #deploymentOfficerTable .tabulator-header .tabulator-col.tabulator-frozen{z-index:14!important;background:#263449!important;color:#fff!important;box-shadow:2px 0 5px rgba(0,0,0,.2)}
+        #deploymentOfficerTable .tabulator-row.tabulator-row-even .tabulator-cell.tabulator-frozen{background:#243247!important}
+        [data-bs-theme="light"] #deploymentOfficerTable .tabulator-cell.tabulator-frozen{background:#e8eef7!important;color:#0f172a!important}
+        [data-bs-theme="light"] #deploymentOfficerTable .tabulator-row.tabulator-row-even .tabulator-cell.tabulator-frozen{background:#dce6f3!important}
+        [data-bs-theme="light"] #deploymentOfficerTable .tabulator-header .tabulator-col.tabulator-frozen{background:#d7e2f0!important;color:#0f172a!important}
+        #deploymentOfficerTable .tabulator-cell[tabulator-field="idsubsls"]{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap;letter-spacing:.01em}
+        @media(max-width:650px){.deployment-category-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}.deployment-category-tab{padding:9px 5px;font-size:10px}}
+        @media (max-width: 900px) { .deployment-password { flex-basis:200px; } .deployment-history { flex-basis:180px; } }
+        .deployment-file-grid-single{grid-template-columns:minmax(0,1fr)}
+        .deployment-file-item-all{border-top:3px solid var(--bs-primary)}
+        #deploymentOfficerTable .tabulator{width:100%;min-width:100%;font-size:12px}
+        #deploymentOfficerTable .tabulator-cell{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.35}
+        #deploymentOfficerTable .tabulator-cell[tabulator-field="officer"]{white-space:normal;min-width:190px}
+        #deploymentOfficerTable .tabulator-cell[tabulator-field="idsubsls"]{white-space:nowrap;min-width:180px;overflow:visible}
+        #deploymentOfficerTable .tabulator-cell.tabulator-frozen{background:#172033!important;color:#fff!important;opacity:1!important}
+        #deploymentOfficerTable .tabulator-row.tabulator-row-even .tabulator-cell.tabulator-frozen{background:#243247!important}
+        #deploymentOfficerTable .tabulator-header .tabulator-col.tabulator-frozen{background:#263449!important;color:#fff!important;opacity:1!important}
+        [data-bs-theme="light"] #deploymentOfficerTable .tabulator-cell.tabulator-frozen{background:#e8eef7!important;color:#0f172a!important}
+        [data-bs-theme="light"] #deploymentOfficerTable .tabulator-row.tabulator-row-even .tabulator-cell.tabulator-frozen{background:#dce6f3!important}
+        [data-bs-theme="light"] #deploymentOfficerTable .tabulator-header .tabulator-col.tabulator-frozen{background:#d7e2f0!important;color:#0f172a!important}
+
+        /* Deployment table: full-width, theme-aware Tabulator surface. */
+        .deployment-table-wrap{width:100%;max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain}
+        #deploymentOfficerTable{width:100%;min-width:100%;max-width:100%}
+        #deploymentOfficerTable .tabulator{width:100%!important;min-width:100%!important;background:var(--bs-body-bg)!important;color:var(--bs-body-color)!important;border:1px solid var(--bs-border-color)!important}
+        #deploymentOfficerTable .tabulator-header,#deploymentOfficerTable .tabulator-header .tabulator-col,#deploymentOfficerTable .tabulator-header .tabulator-col .tabulator-col-content{background:var(--bs-tertiary-bg)!important;color:var(--bs-body-color)!important;border-color:var(--bs-border-color)!important}
+        #deploymentOfficerTable .tabulator-tableholder{width:100%;background:var(--bs-body-bg)!important;overflow-x:auto!important}
+        #deploymentOfficerTable .tabulator-row{background:var(--bs-body-bg)!important;color:var(--bs-body-color)!important;border-color:var(--bs-border-color)!important}
+        #deploymentOfficerTable .tabulator-row:nth-child(even){background:var(--bs-secondary-bg)!important}
+        #deploymentOfficerTable .tabulator-row:hover{background:var(--bs-tertiary-bg)!important}
+        #deploymentOfficerTable .tabulator-cell{background:transparent!important;color:var(--bs-body-color)!important;border-color:var(--bs-border-color)!important}
+        #deploymentOfficerTable .tabulator-footer,#deploymentOfficerTable .tabulator-paginator,#deploymentOfficerTable .tabulator-page,#deploymentOfficerTable .tabulator-page-size{background:var(--bs-tertiary-bg)!important;color:var(--bs-body-color)!important;border-color:var(--bs-border-color)!important}
+        #deploymentOfficerTable .tabulator-cell[tabulator-field="officer"]{white-space:normal!important;overflow-wrap:anywhere;min-width:220px}
+        #deploymentOfficerTable .tabulator-cell[tabulator-field="idsubsls"]{white-space:nowrap!important;overflow:visible!important;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+        #deploymentOfficerTable .tabulator-cell.tabulator-frozen{background:#172033!important;color:#f8fafc!important;opacity:1!important;box-shadow:2px 0 5px rgba(0,0,0,.16)}
+        #deploymentOfficerTable .tabulator-row:nth-child(even) .tabulator-cell.tabulator-frozen{background:#243247!important;color:#f8fafc!important}
+        #deploymentOfficerTable .tabulator-header .tabulator-col.tabulator-frozen{background:#263449!important;color:#fff!important;opacity:1!important}
+        [data-bs-theme="light"] #deploymentOfficerTable .tabulator-cell.tabulator-frozen{background:#f1f5f9!important;color:#0f172a!important}
+        [data-bs-theme="light"] #deploymentOfficerTable .tabulator-row:nth-child(even) .tabulator-cell.tabulator-frozen{background:#e2eaf4!important;color:#0f172a!important}
+        [data-bs-theme="light"] #deploymentOfficerTable .tabulator-header .tabulator-col.tabulator-frozen{background:#dbeafe!important;color:#0f172a!important}
+        [data-bs-theme="light"] #deploymentOfficerTable .tabulator-row,[data-bs-theme="light"] #deploymentOfficerTable .tabulator-cell,[data-bs-theme="light"] #deploymentOfficerTable .tabulator-header,[data-bs-theme="light"] #deploymentOfficerTable .tabulator-col{color:#0f172a!important}
+        @media(max-width:700px){.deployment-table-wrap{overflow-x:auto}#deploymentOfficerTable .tabulator{min-width:900px!important}}
+#deploymentReconciliationOffcanvas{background:var(--bs-body-bg);color:var(--bs-body-color)}
+        #deploymentReconciliationOffcanvas .offcanvas-header{border-color:var(--bs-border-color)!important}
+        #deploymentReconciliationOffcanvas .form-control{background:var(--bs-form-control-bg);color:var(--bs-body-color);border-color:var(--bs-border-color)}
+        .deployment-reconciliation-wrap{max-height:calc(100vh - 230px);overflow:auto;border:1px solid var(--bs-border-color);border-radius:.65rem}
+        .deployment-reconciliation-table{color:var(--bs-body-color);background:var(--bs-body-bg);min-width:760px}
+        .deployment-reconciliation-table thead th{position:sticky;top:0;z-index:2;background:var(--bs-tertiary-bg);color:var(--bs-body-color);white-space:nowrap;border-bottom:1px solid var(--bs-border-color)}
+        .deployment-reconciliation-table tbody td{background:var(--bs-body-bg);color:var(--bs-body-color);border-color:var(--bs-border-color);vertical-align:middle}
+        .deployment-reconciliation-table tbody tr:nth-child(even) td{background:var(--bs-secondary-bg)}
+        .deployment-reconciliation-table tbody tr:hover td{background:var(--bs-tertiary-bg)}
+\n
+        /* Consistent dashboard gutters and prevent accidental page-level horizontal overflow. */
+        *,*::before,*::after{box-sizing:border-box}
+        html,body{max-width:100%;overflow-x:clip}
+        .container-dashboard{
+            width:100%;
+            max-width:100%;
+            min-width:0;
+            padding:clamp(16px,2vw,26px);
+            overflow-x:clip;
+        }
+        .container-dashboard>section,
+        .container-dashboard>nav,
+        .container-dashboard>.row,
+        .container-dashboard .chart-card,
+        .container-dashboard .cmp-section{
+            min-width:0;
+            max-width:100%;
+        }
+        .container-dashboard section{min-width:0}
+        .container-dashboard .row{--bs-gutter-x:1.25rem}
+        #deploymentModule{padding-inline:clamp(2px,.35vw,6px)}
+        #deploymentModule>div:first-child{padding-inline:2px}
+        #deploymentModule .chart-card,
+        #deploymentModule .bp-breakdown-card{min-width:0}
+        @media(max-width:767.98px){
+            .container-dashboard{padding:12px;overflow-x:clip}
+            .container-dashboard .row{--bs-gutter-x:.9rem}
+            #deploymentModule{padding-inline:0}
+            #deploymentModule>div:first-child{padding-inline:0}
+        }
+
+
+        /* Deployment officer column stays compact so the horizontally scrollable data remains usable on phones. */
+        #deploymentOfficerTable .tabulator-cell[tabulator-field="officer"],
+        #deploymentOfficerTable .tabulator-header .tabulator-col[tabulator-field="officer"]{max-width:190px}
+        #deploymentOfficerTable .tabulator-cell[tabulator-field="officer"]{white-space:normal!important;overflow-wrap:anywhere;line-height:1.3}
+        @media(max-width:767.98px){
+          #deploymentOfficerTable .tabulator-cell[tabulator-field="officer"],
+          #deploymentOfficerTable .tabulator-header .tabulator-col[tabulator-field="officer"]{max-width:145px!important}
+          #deploymentOfficerTable .tabulator{min-width:820px!important}
+        }
+
+
+
+        /* v75: Deployment SE2026 uses the same Tabulator visual language as Data Enumerator. */
+        #deploymentModule .deployment-table-wrap {
+            display:block !important;
+            width:100% !important;
+            max-width:100% !important;
+            min-width:0 !important;
+            overflow-x:auto !important;
+            overflow-y:hidden !important;
+            overscroll-behavior-x:contain !important;
+            -webkit-overflow-scrolling:touch !important;
+            touch-action:pan-x pan-y !important;
+            scrollbar-width:thin;
+        }
+        #deploymentModule #deploymentOfficerTable {
+            display:block !important;
+            width:100% !important;
+            min-width:0 !important;
+            max-width:100% !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator {
+            width:max-content !important;
+            min-width:100% !important;
+            max-width:none !important;
+            border:0 !important;
+            border-radius:15px !important;
+            overflow:hidden !important;
+            background:var(--bg-2) !important;
+            color:var(--text) !important;
+            font-size:12px !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-header,
+        #deploymentModule #deploymentOfficerTable .tabulator-tableholder,
+        #deploymentModule #deploymentOfficerTable .tabulator-footer {
+            background-color:var(--bg-2) !important;
+            color:var(--text) !important;
+            border-color:var(--border) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col,
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col .tabulator-col-content,
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col-title,
+        #deploymentModule #deploymentOfficerTable .tabulator-col-title {
+            background-color:transparent !important;
+            color:var(--text) !important;
+            border-color:var(--border) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col-title {
+            white-space:normal !important;
+            overflow-wrap:anywhere !important;
+            word-break:normal !important;
+            line-height:1.2 !important;
+            text-align:center !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col .tabulator-col-content {
+            min-height:58px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:7px 6px;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col .tabulator-header-filter input {
+            background:var(--card-solid) !important;
+            color:var(--text) !important;
+            border:1px solid var(--border) !important;
+            border-radius:6px !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-row {
+            min-height:42px !important;
+            background-color:transparent !important;
+            color:var(--text) !important;
+            border-bottom:1px solid var(--border) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-row.tabulator-row-even {
+            background-color:var(--row-even-bg) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-row:hover {
+            background-color:var(--row-hover-bg) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-row .tabulator-cell,
+        #deploymentModule #deploymentOfficerTable .tabulator-cell {
+            white-space:nowrap;
+            background:transparent !important;
+            color:var(--text) !important;
+            border-right:1px solid var(--border) !important;
+            border-bottom:0 !important;
+            padding:8px 9px !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-cell[tabulator-field="officer"] {
+            max-width:190px;
+            min-width:160px;
+            white-space:normal !important;
+            overflow-wrap:anywhere;
+            line-height:1.3;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-cell[tabulator-field="idsubsls"] {
+            min-width:170px;
+            white-space:nowrap !important;
+            font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+            letter-spacing:.01em;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-cell.tabulator-frozen {
+            z-index:12 !important;
+            background:inherit !important;
+            color:inherit !important;
+            box-shadow:2px 0 5px rgba(0,0,0,.16) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col.tabulator-frozen {
+            z-index:14 !important;
+            background:var(--bg-2) !important;
+            color:var(--text) !important;
+            box-shadow:2px 0 5px rgba(0,0,0,.18) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .deployment-col-header {
+            font-weight:700;
+        }
+        #deploymentModule #deploymentOfficerTable .deployment-col-header.deployment-col-keluarga {
+            border-top:3px solid #3b82f6 !important;
+        }
+        #deploymentModule #deploymentOfficerTable .deployment-col-header.deployment-col-usaha_keluarga {
+            border-top:3px solid #0d9488 !important;
+        }
+        #deploymentModule #deploymentOfficerTable .deployment-col-header.deployment-col-usaha_bku {
+            border-top:3px solid #d97706 !important;
+        }
+        #deploymentModule #deploymentOfficerTable .deployment-count-cell {
+            font-variant-numeric:tabular-nums;
+            font-weight:600;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-paginator,
+        #deploymentModule #deploymentOfficerTable .tabulator-page,
+        #deploymentModule #deploymentOfficerTable .tabulator-page-size {
+            color:var(--text) !important;
+            background:var(--card-solid) !important;
+            border:1px solid var(--border) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-page.active {
+            background:var(--primary) !important;
+            color:#fff !important;
+            border-color:var(--primary) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-placeholder span {
+            color:var(--text-mute) !important;
+        }
+
+        /* Light mode mirrors the white/slate Data Enumerator table. */
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-header,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-tableholder,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-footer {
+            background:#fff !important;
+            color:#0f172a !important;
+            border-color:#dbe3ee !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col .tabulator-col-content {
+            background:#eef2f7 !important;
+            color:#0f172a !important;
+            border-color:#dbe3ee !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col-title,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-col-title {
+            color:#0f172a !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-row {
+            background:#fff !important;
+            color:#0f172a !important;
+            border-color:#e2e8f0 !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-row.tabulator-row-even {
+            background:#f8fafc !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-row:hover {
+            background:#eff6ff !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-cell {
+            background:transparent !important;
+            color:#0f172a !important;
+            border-color:#e2e8f0 !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-cell.tabulator-frozen {
+            background:inherit !important;
+            color:inherit !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col.tabulator-frozen {
+            background:#eef2f7 !important;
+            color:#0f172a !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-paginator,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-page,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-page-size {
+            background:#fff !important;
+            color:#0f172a !important;
+            border-color:#cbd5e1 !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-page.active {
+            background:var(--primary) !important;
+            color:#fff !important;
+            border-color:var(--primary) !important;
+        }
+        @media(max-width:767.98px) {
+            #deploymentModule #deploymentOfficerTable .tabulator {
+                min-width:900px !important;
+                font-size:11px !important;
+            }
+            #deploymentModule #deploymentOfficerTable .tabulator-cell {
+                padding:7px 8px !important;
+                font-size:11px !important;
+            }
+            #deploymentModule #deploymentOfficerTable .tabulator-cell[tabulator-field="officer"] {
+                max-width:145px !important;
+                min-width:135px !important;
+            }
+        }
+
+
+        /* v76: one horizontal scroll surface; no frozen columns so header and body move together. */
+        #deploymentModule .deployment-table-wrap {
+            width:100% !important;
+            max-width:100% !important;
+            min-width:0 !important;
+            overflow:visible !important;
+            overscroll-behavior-x:contain !important;
+        }
+        #deploymentModule #deploymentOfficerTable {
+            display:block !important;
+            width:100% !important;
+            max-width:100% !important;
+            min-width:0 !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator {
+            width:100% !important;
+            min-width:0 !important;
+            max-width:100% !important;
+            overflow:hidden !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-header {
+            width:100% !important;
+            overflow:hidden !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-tableholder {
+            width:100% !important;
+            max-width:100% !important;
+            overflow-x:auto !important;
+            overflow-y:auto !important;
+            -webkit-overflow-scrolling:touch !important;
+            overscroll-behavior-x:contain !important;
+            touch-action:pan-x pan-y !important;
+            scrollbar-width:thin;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-cell[tabulator-field="idsubsls"] {
+            text-align:left !important;
+            white-space:nowrap !important;
+            font-family:ui-monospace,SFMono-Regular,Menlo,monospace !important;
+            letter-spacing:.01em;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col[tabulator-field="idsubsls"] .tabulator-col-content {
+            justify-content:flex-start !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col[tabulator-field="idsubsls"] .tabulator-col-title {
+            text-align:left !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-cell.tabulator-frozen,
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col.tabulator-frozen {
+            position:static !important;
+            left:auto !important;
+            box-shadow:none !important;
+        }
+        @media(max-width:767.98px) {
+            #deploymentModule #deploymentOfficerTable .tabulator {
+                width:100% !important;
+                min-width:0 !important;
+                max-width:100% !important;
+                font-size:11px !important;
+            }
+            #deploymentModule #deploymentOfficerTable .tabulator-cell {
+                padding:7px 8px !important;
+                font-size:11px !important;
+            }
+            #deploymentModule #deploymentOfficerTable .tabulator-cell[tabulator-field="officer"],
+            #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col[tabulator-field="officer"] {
+                min-width:145px !important;
+                max-width:170px !important;
+            }
+            #deploymentModule #deploymentOfficerTable .tabulator-cell[tabulator-field="idsubsls"],
+            #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col[tabulator-field="idsubsls"] {
+                min-width:180px !important;
+            }
+        }
+
+
+        /* v77: transparent Deployment table surface; inherit colors from the active app theme. */
+        #deploymentModule #deploymentOfficerTable .tabulator,
+        #deploymentModule #deploymentOfficerTable .tabulator-header,
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col,
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col .tabulator-col-content,
+        #deploymentModule #deploymentOfficerTable .tabulator-tableholder,
+        #deploymentModule #deploymentOfficerTable .tabulator-table,
+        #deploymentModule #deploymentOfficerTable .tabulator-footer,
+        #deploymentModule #deploymentOfficerTable .tabulator-calcs-holder,
+        #deploymentModule #deploymentOfficerTable .tabulator-calcs,
+        #deploymentModule #deploymentOfficerTable .tabulator-row,
+        #deploymentModule #deploymentOfficerTable .tabulator-row.tabulator-row-even,
+        #deploymentModule #deploymentOfficerTable .tabulator-row.tabulator-row-odd,
+        #deploymentModule #deploymentOfficerTable .tabulator-cell,
+        #deploymentModule #deploymentOfficerTable .tabulator-col,
+        #deploymentModule #deploymentOfficerTable .tabulator-col-content {
+            background:transparent !important;
+            background-color:transparent !important;
+            background-image:none !important;
+            color:var(--text) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator {
+            border:0 !important;
+            box-shadow:none !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-header {
+            border-top:0 !important;
+            border-left:0 !important;
+            border-right:0 !important;
+            border-bottom:1px solid var(--border) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col,
+        #deploymentModule #deploymentOfficerTable .tabulator-cell {
+            border-color:var(--border) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-row {
+            border-bottom:1px solid var(--border) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-row:hover,
+        #deploymentModule #deploymentOfficerTable .tabulator-row.tabulator-row-even:hover,
+        #deploymentModule #deploymentOfficerTable .tabulator-row.tabulator-row-odd:hover {
+            background:var(--row-hover-bg) !important;
+            background-color:var(--row-hover-bg) !important;
+        }
+        /* Remove old category column fills; retain only the slim colored header accents. */
+        #deploymentModule #deploymentOfficerTable .deployment-col-keluarga,
+        #deploymentModule #deploymentOfficerTable .deployment-col-usaha_keluarga,
+        #deploymentModule #deploymentOfficerTable .deployment-col-usaha_bku,
+        #deploymentModule #deploymentOfficerTable .tabulator-col[tabulator-field^="keluarga_"],
+        #deploymentModule #deploymentOfficerTable .tabulator-col[tabulator-field^="usaha_keluarga_"],
+        #deploymentModule #deploymentOfficerTable .tabulator-col[tabulator-field^="usaha_bku_"] {
+            background:transparent !important;
+            background-color:transparent !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-paginator,
+        #deploymentModule #deploymentOfficerTable .tabulator-page,
+        #deploymentModule #deploymentOfficerTable .tabulator-page-size {
+            background:transparent !important;
+            background-color:transparent !important;
+            color:var(--text) !important;
+            border-color:var(--border) !important;
+            box-shadow:none !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-page.active {
+            background:var(--primary) !important;
+            background-color:var(--primary) !important;
+            color:#fff !important;
+            border-color:var(--primary) !important;
+        }
+        #deploymentModule #deploymentOfficerTable .tabulator-cell.tabulator-frozen,
+        #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col.tabulator-frozen {
+            background:transparent !important;
+            background-color:transparent !important;
+            box-shadow:none !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-header,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-header .tabulator-col .tabulator-col-content,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-tableholder,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-table,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-footer,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-calcs-holder,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-calcs,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-row,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-row.tabulator-row-even,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-row.tabulator-row-odd,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-cell,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-col,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-col-content {
+            background:transparent !important;
+            background-color:transparent !important;
+            background-image:none !important;
+            color:var(--text) !important;
+            border-color:var(--border) !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-row:hover,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-row.tabulator-row-even:hover,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-row.tabulator-row-odd:hover {
+            background:var(--row-hover-bg) !important;
+            background-color:var(--row-hover-bg) !important;
+        }
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-paginator,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-page,
+        [data-bs-theme="light"] #deploymentModule #deploymentOfficerTable .tabulator-page-size {
+            background:transparent !important;
+            background-color:transparent !important;
+            color:var(--text) !important;
+            border-color:var(--border) !important;
+        }
+
+
+
+        /* v83: isolate chart/table cards and make Target & Realisasi use the exact Deployment scroll model.
+           Tabulator owns column widths; only .tabulator-tableholder owns horizontal + vertical scrolling.
+           Do not assign widths to .tabulator-headers or .tabulator-table separately. */
+        #targetRealizationModule,
+        #targetRealizationModule #se2026WorkloadSection,
+        #targetRealizationModule #se2026WorkloadSection > .chart-card {
+            width:100% !important;
+            max-width:100% !important;
+            min-width:0 !important;
+        }
+        #targetRealizationModule #se2026WorkloadSection {
+            display:flex !important;
+            flex-direction:column !important;
+            align-items:stretch !important;
+            gap:24px !important;
+        }
+        #targetRealizationModule #se2026WorkloadChartCard {
+            overflow:hidden !important;
+        }
+        #targetRealizationModule .se2026-workload-chart-viewport,
+        #targetRealizationModule #se2026WorkloadChart,
+        #targetRealizationModule #se2026WorkloadChart .apexcharts-canvas,
+        #targetRealizationModule #se2026WorkloadChart .apexcharts-svg {
+            width:100% !important;
+            max-width:100% !important;
+            min-width:0 !important;
+        }
+        #targetRealizationModule #se2026WorkloadTableCard {
+            overflow:visible !important;
+        }
+        #targetRealizationModule .se2026-workload-table-wrap,
+        #targetRealizationModule .deployment-table-wrap.se2026-workload-table-wrap {
+            display:block !important;
+            width:100% !important;
+            max-width:100% !important;
+            min-width:0 !important;
+            overflow:visible !important;
+            position:relative !important;
+            overscroll-behavior-x:contain !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable {
+            display:block !important;
+            width:100% !important;
+            max-width:100% !important;
+            min-width:0 !important;
+            overflow:visible !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator {
+            display:block !important;
+            width:100% !important;
+            max-width:100% !important;
+            min-width:0 !important;
+            height:620px !important;
+            overflow:hidden !important;
+            border:0 !important;
+            border-radius:0 !important;
+            box-shadow:none !important;
+            background:transparent !important;
+            background-color:transparent !important;
+            color:var(--text) !important;
+            font-size:12px !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-header {
+            display:block !important;
+            width:100% !important;
+            max-width:100% !important;
+            overflow:hidden !important;
+            background:transparent !important;
+            background-color:transparent !important;
+            color:var(--text) !important;
+            border:0 !important;
+            border-bottom:1px solid var(--border) !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-header .tabulator-col,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-header .tabulator-col .tabulator-col-content,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-header .tabulator-col-title,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-cell,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-col,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-col-content {
+            background:transparent !important;
+            background-color:transparent !important;
+            background-image:none !important;
+            color:var(--text) !important;
+            border-color:var(--border) !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-header .tabulator-col-title {
+            white-space:normal !important;
+            overflow-wrap:anywhere !important;
+            word-break:normal !important;
+            line-height:1.2 !important;
+            text-align:center !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-header .tabulator-col .tabulator-col-content {
+            min-height:64px !important;
+            display:flex !important;
+            align-items:center !important;
+            justify-content:center !important;
+            padding:7px 6px !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-tableholder {
+            display:block !important;
+            width:100% !important;
+            max-width:100% !important;
+            overflow-x:auto !important;
+            overflow-y:auto !important;
+            -webkit-overflow-scrolling:touch !important;
+            overscroll-behavior-x:contain !important;
+            overscroll-behavior-y:contain !important;
+            touch-action:pan-x pan-y !important;
+            scrollbar-width:thin;
+            background:transparent !important;
+            background-color:transparent !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-table,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-footer,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-paginator,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-calcs-holder,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-calcs {
+            background:transparent !important;
+            background-color:transparent !important;
+            background-image:none !important;
+            color:var(--text) !important;
+            border-color:var(--border) !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-row,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-row.tabulator-row-even,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-row.tabulator-row-odd,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-row:nth-child(odd),
+        #targetRealizationModule #se2026WorkloadTable .tabulator-row:nth-child(even) {
+            min-height:38px !important;
+            background:transparent !important;
+            background-color:transparent !important;
+            background-image:none !important;
+            color:var(--text) !important;
+            border-bottom:1px solid var(--border) !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-row:hover,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-row.tabulator-row-even:hover,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-row.tabulator-row-odd:hover {
+            background:var(--row-hover-bg) !important;
+            background-color:var(--row-hover-bg) !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-cell {
+            padding:8px 9px !important;
+            border-right:1px solid var(--border) !important;
+            border-bottom:0 !important;
+            white-space:nowrap;
+            background:transparent !important;
+            color:var(--text) !important;
+        }
+        /* Keep the first body cell on Tabulator's computed column width.
+           The column is configured as 240px in JS; a body-only max-width
+           makes body borders drift ~20px from the header separators. */
+        #targetRealizationModule #se2026WorkloadTable .tabulator-cell[tabulator-field="name"] {
+            white-space:normal !important;
+            overflow-wrap:anywhere !important;
+            line-height:1.3 !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-footer {
+            display:flex !important;
+            justify-content:flex-end !important;
+            align-items:center !important;
+            flex-wrap:wrap !important;
+            min-height:42px !important;
+            height:auto !important;
+            padding:6px 10px !important;
+            overflow:visible !important;
+            border-top:1px solid var(--border) !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-paginator {
+            display:flex !important;
+            justify-content:flex-end !important;
+            align-items:center !important;
+            flex-wrap:wrap !important;
+            gap:4px !important;
+            margin-left:auto !important;
+            overflow:visible !important;
+            white-space:normal !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-page,
+        #targetRealizationModule #se2026WorkloadTable .tabulator-page-size {
+            flex:0 0 auto !important;
+            min-width:32px !important;
+            background:transparent !important;
+            background-color:transparent !important;
+            color:var(--text) !important;
+            border:1px solid var(--border) !important;
+            box-shadow:none !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .tabulator-page.active {
+            background:var(--primary) !important;
+            background-color:var(--primary) !important;
+            color:#fff !important;
+            border-color:var(--primary) !important;
+        }
+        #targetRealizationModule #se2026WorkloadTable .se2026-daily-pill {
+            color:#3ECF8E !important;
+            background:rgba(62,207,142,.13) !important;
+            border-color:rgba(62,207,142,.34) !important;
+        }
+        [data-bs-theme="light"] #targetRealizationModule #se2026WorkloadTable .se2026-daily-pill {
+            color:#137A55 !important;
+            background:#E9FBF2 !important;
+            border-color:#B6EAD0 !important;
+        }
+        @media(max-width:767.98px) {
+            #targetRealizationModule #se2026WorkloadTable .tabulator {
+                font-size:11px !important;
+            }
+            #targetRealizationModule #se2026WorkloadTable .tabulator-cell {
+                padding:7px 8px !important;
+                font-size:11px !important;
+            }
+            #targetRealizationModule #se2026WorkloadTable .tabulator-header .tabulator-col .tabulator-col-content {
+                min-height:68px !important;
+                padding:6px 5px !important;
+            }
+        }
+
+</style>
 
 </head>
 
@@ -1520,15 +2260,23 @@
         </div>
     </header>
 
-    <div class="container-dashboard">
+    <div class="module-navigation-shell">
         <nav class="module-navigation" role="tablist" aria-label="Navigasi modul">
             <button class="module-tab active" id="menuMonitoring" type="button" role="tab" aria-selected="true" aria-controls="monitoringModule">
                 <i class="bi bi-speedometer2"></i><span>Monitoring Progress</span>
             </button>
             <button class="module-tab" id="menuBusinessPresence" type="button" role="tab" aria-selected="false" aria-controls="businessPresenceModule">
-                <i class="bi bi-people-fill"></i><span>Keberadaan Keluarga/Usaha</span>
+                <i class="bi bi-clipboard2-data-fill"></i><span>Daftar Assignment</span>
+            </button>
+            <button class="module-tab" id="menuDeployment" type="button" role="tab" aria-selected="false" aria-controls="deploymentModule">
+                <i class="bi bi-diagram-3-fill"></i><span>Deployment SE2026</span>
+            </button>
+            <button class="module-tab" id="menuTargetRealization" type="button" role="tab" aria-selected="false" aria-controls="targetRealizationModule">
+                <i class="bi bi-bullseye"></i><span>Target dan Realisasi</span>
             </button>
         </nav>
+    </div>
+    <div class="container-dashboard">
         <section id="monitoringModule">
 
         <div class="mb-4 d-flex justify-content-center">
@@ -1563,7 +2311,7 @@
                 ["Open", "open", "bi-folder", "#0ea5e9"],
                 ["Draft", "draft", "bi-pencil-square", "#f59e0b"],
                 ["Submitted", "submitted", "bi-send-check", "#22c55e"],
-                ["Approved", "approved", "bi-patch-check", "#8b5cf6"],
+                ["Complete", "completedByPengawas", "bi-check2-circle", "#8b5cf6"],
                 ["Rejected", "rejected", "bi-x-circle", "#ef4444"],
                 ["Revoke", "revoke", "bi-arrow-counterclockwise", "#374151"],
                 ["Progress", "progress", "bi-speedometer2", "#10b981"]
@@ -1601,26 +2349,7 @@
             <div class="row g-3" id="comparisonCards"></div>
         </div>
 
-        <section id="se2026WorkloadSection" class="chart-card mt-4 mb-4">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                <div class="chart-title mb-0"><i class="bi bi-bullseye text-primary"></i> Perbandingan terhadap Assignment SE2026</div>
-                <button type="button" class="btn btn-success btn-sm" id="btnExportSe2026Workload"><i class="bi bi-file-earmark-excel me-1"></i> Export Excel</button>
-            </div>
-            <div class="row g-3 align-items-stretch">
-                <div class="col-12 col-xl-6">
-                    <div class="h-100 p-2 rounded-3" style="background:var(--card-solid);border:1px solid var(--border);">
-                        <div class="small fw-semibold mb-2 text-secondary">Grafik Muatan dan Assignment</div>
-                        <div id="se2026WorkloadChart" style="min-height:520px;width:100%;"></div>
-                    </div>
-                </div>
-                <div class="col-12 col-xl-6">
-                    <div class="h-100 p-2 rounded-3" style="background:var(--card-solid);border:1px solid var(--border);">
-                        <div class="small fw-semibold mb-2 text-secondary">Rincian per Petugas</div>
-                        <div class="se2026-workload-table-wrap"><div id="se2026WorkloadTable"></div></div>
-                    </div>
-                </div>
-            </div>
-        </section>
+
 
         <div class="row mt-4 g-4">
             <div class="col-xl-4 d-flex">
@@ -1749,22 +2478,40 @@
                     </div>
                 </div>
 
+
+
+                <footer class="text-center mt-5 mb-4 text-secondary">
+                    <small>
+                        SE2026 Monitoring Center<br>
+                        Powered by Bootstrap 5 • ApexCharts • Grid.js
+                    </small>
+                </footer>
+        </section>
+
                 <div class="modal fade" id="uploadModal" tabindex="-1">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">
                                     <i class="bi bi-cloud-upload"></i>
-                                    Upload JSON <span class="badge bg-secondary ms-1" id="uploadCount">0</span>
+                                    Upload Data <span class="badge bg-secondary ms-1" id="uploadCount">0</span>
                                 </h5>
                                 <button class="btn-close" data-bs-dismiss="modal"
                                     data-testid="upload-modal-close"></button>
                             </div>
 
                             <div class="modal-body">
-                                <div id="dropZone" class="drop-zone" data-testid="upload-dropzone">
+                                <p class="text-secondary small mb-3">Pilih jenis data yang ingin diperbarui. Kedua proses upload dapat dilakukan secara terpisah.</p>
+                                <div class="row g-3">
+                                  <div class="col-12 col-lg-6">
+                                    <div class="h-100 border rounded-3 p-3" style="border-color:var(--border)!important;background:var(--card-solid)">
+                                      <div class="fw-bold mb-1"><i class="bi bi-filetype-json text-primary me-1"></i>Data Monitoring FASIH</div>
+                                      <div class="small text-secondary mb-3">Upload satu atau beberapa file JSON untuk memperbarui progres Pencacah dan Pengawas.</div>
+                                      <div id="dropZone" class="drop-zone" data-testid="upload-dropzone">
                                     <i class="bi bi-cloud-upload drop-zone-icon"></i>
-                                    <div class="drop-zone-title">Drag &amp; drop file <code>.json</code> di sini</div>
+                                    <div class="drop-zone-title">Upload JSON FASIH</div>
+                                    <div class="drop-zone-sub">Bagian ini hanya untuk file <code>.json</code>. Tidak wajib jika hanya ingin upload Excel Deployment.</div>
+                                    <div class="drop-zone-sub mt-1">Drag &amp; drop file <code>.json</code> di sini</div>
                                     <div class="drop-zone-sub">
                                         atau
                                         <button type="button" id="btnPickFiles"
@@ -1777,29 +2524,31 @@
                                         multiple data-testid="upload-file-input">
                                 </div>
 
-                                <div id="fileList" class="file-list mt-3" data-testid="upload-file-list"></div>
-
-                                <div class="mt-3">
-                                    <label for="uploadPassword" class="form-label small text-secondary mb-1">
-                                        <i class="bi bi-shield-lock"></i> Password Upload
-                                    </label>
-                                    <div class="pw-input-wrap">
-                                        <input type="password" id="uploadPassword" class="form-control"
-                                            placeholder="Masukkan password upload" autocomplete="current-password"
-                                            data-testid="upload-password">
-                                        <button type="button" class="pw-input-toggle" id="btnTogglePw"
-                                            data-testid="upload-toggle-pw">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
+                                      <div id="fileList" class="file-list mt-3" data-testid="upload-file-list"></div>
+                                      <div class="d-flex justify-content-end mt-3"><button id="btnUpload" class="btn btn-primary" data-testid="upload-submit"><i class="bi bi-cloud-arrow-up"></i> Upload JSON Terpilih</button></div>
+                                      <div class="small text-secondary mt-3"><i class="bi bi-info-circle"></i> Role dan tanggal dideteksi otomatis dari isi file. Tanggal hari ini menjadi data live + snapshot; tanggal lampau hanya snapshot.</div>
                                     </div>
+                                  </div>
+                                  <div class="col-12 col-lg-6">
+                                    <div class="h-100 border rounded-3 p-3" style="border-color:var(--border)!important;background:var(--card-solid)">
+                                      <div class="fw-bold mb-1"><i class="bi bi-file-earmark-excel text-success me-1"></i>Deployment SE2026</div>
+                                      <div class="small text-secondary mb-3">Pilih tepat tiga file Excel: Keluarga, Usaha Keluarga, dan Usaha BKU.</div>
+                                      <span class="badge text-bg-success mb-3">3 file Excel wajib</span>
+                                      <input class="form-control form-control-sm" type="file" id="deploymentFilesAll" accept=".xlsx,.xls" multiple>
+                                      <div class="small text-secondary mt-2" id="deploymentSelectedFiles">Belum ada file Excel deployment dipilih.</div>
+                                      <div class="small text-secondary mt-2">Nama file harus diawali tanggal <code>yyyymmdd_</code> dan tanggal ketiganya harus sama.</div>
+                                      <div class="d-flex justify-content-end mt-3"><button type="button" class="btn btn-success btn-sm" id="btnUploadDeployment"><i class="bi bi-cloud-arrow-up me-1"></i>Upload Excel Deployment</button></div>
+                                      <div id="deploymentUploadMessage" class="small mt-2" role="status">Belum ada upload deployment pada sesi ini.</div>
+                                    </div>
+                                  </div>
                                 </div>
-
-                                <div class="mt-3">
-                                    <small class="text-secondary d-block">
-                                        <i class="bi bi-info-circle"></i>
-                                        Role &amp; tanggal dideteksi otomatis dari isi &amp; nama file. Tanggal <b>hari
-                                            ini</b> menjadi data live + snapshot; tanggal lampau hanya snapshot.
-                                    </small>
+                                <div class="border-top mt-4 pt-3">
+                                  <label for="uploadPassword" class="form-label small fw-semibold mb-1"><i class="bi bi-shield-lock me-1"></i>Verifikasi Password Upload</label>
+                                  <div class="pw-input-wrap">
+                                    <input type="password" id="uploadPassword" class="form-control" placeholder="Masukkan password untuk otorisasi upload" autocomplete="current-password" data-testid="upload-password">
+                                    <button type="button" class="pw-input-toggle" id="btnTogglePw" data-testid="upload-toggle-pw"><i class="bi bi-eye"></i></button>
+                                  </div>
+                                  <small class="text-secondary d-block mt-2">Password digunakan untuk mengotorisasi proses upload JSON maupun Excel.</small>
                                 </div>
                             </div>
 
@@ -1810,20 +2559,46 @@
                                 </a>
                                 <button class="btn btn-secondary" data-bs-dismiss="modal"
                                     data-testid="upload-cancel">Batal</button>
-                                <button id="btnUpload" class="btn btn-primary" data-testid="upload-submit">
-                                    <i class="bi bi-cloud-arrow-up"></i> Upload Semua
-                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <footer class="text-center mt-5 mb-4 text-secondary">
-                    <small>
-                        SE2026 Monitoring Center<br>
-                        Powered by Bootstrap 5 • ApexCharts • Grid.js
-                    </small>
-                </footer>
+        <section id="targetRealizationModule" class="d-none">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div>
+                    <h3 class="mb-1"><i class="bi bi-bullseye text-primary me-2"></i>Target dan Realisasi</h3>
+                    <div class="text-secondary small">Target Muatan SE2026 dibandingkan dengan realisasi PES SE2026 per PPL/PCL.</div>
+                </div>
+            </div>
+        <section id="se2026WorkloadSection" class="mt-4 mb-4 d-flex flex-column gap-4">
+            <!-- Chart and data table are separate cards so the chart's intrinsic width cannot constrain table scrolling. -->
+            <div id="se2026WorkloadChartCard" class="chart-card">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div class="chart-title mb-0"><i class="bi bi-bullseye text-primary"></i> Perbandingan Muatan dan Realisasi PES SE2026</div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div class="small text-secondary" id="se2026WorkloadMatchInfo">Mengambil data realisasi dari snapshot Deployment SE2026...</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="se2026WorkloadHistorySelect" class="small text-secondary text-nowrap mb-0">Riwayat snapshot</label>
+                        <select class="form-select form-select-sm" id="se2026WorkloadHistorySelect" style="min-width:170px;max-width:220px" aria-label="Pilih riwayat snapshot"><option value="">Memuat riwayat...</option></select>
+                    </div>
+                </div>
+                <div id="se2026WorkloadChart" class="se2026-workload-chart-viewport" style="min-height:520px;width:100%;"></div>
+            </div>
+
+            <div id="se2026WorkloadTableCard" class="chart-card">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                    <div class="chart-title mb-0">Rincian Target dan Realisasi per Petugas</div>
+                    <button type="button" class="btn btn-success btn-sm" id="btnExportSe2026Workload"><i class="bi bi-file-earmark-excel me-1"></i> Export Excel</button>
+                </div>
+                <div class="deployment-table-toolbar">
+                    <input type="search" class="form-control form-control-sm deployment-table-search" id="se2026WorkloadSearch" placeholder="Cari nama petugas..." aria-label="Cari nama petugas">
+                    <div class="small text-secondary" id="se2026WorkloadTableCount">-</div>
+                </div>
+                <div class="deployment-table-wrap se2026-workload-table-wrap"><div id="se2026WorkloadTable"></div></div>
+            </div>
+        </section>
         </section>
 
                 <div class="modal fade" id="businessUploadModal" tabindex="-1" aria-hidden="true">
@@ -1842,7 +2617,7 @@
 
         <section id="businessPresenceModule" class="d-none">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-                <div><h3 class="mb-1"><i class="bi bi-people-fill text-primary me-2"></i>Keberadaan Keluarga/Usaha</h3><div class="text-secondary small">Monitoring keberadaan keluarga, keberadaan usaha, dan status pendataan.</div></div>
+                <div><h3 class="mb-1"><i class="bi bi-clipboard2-data-fill text-primary me-2"></i>Daftar Assignment</h3><div class="text-secondary small">Daftar assignment keluarga dan usaha beserta status keberadaan dan status pendataannya.</div></div>
                 <div class="d-flex gap-2"><button class="btn btn-outline-secondary" id="btnBusinessRefresh"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button><button class="btn btn-primary" id="btnOpenBusinessUpload"><i class="bi bi-upload me-1"></i>Upload Excel</button></div>
             </div>
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
@@ -1913,16 +2688,143 @@
         .schedule-progress-fill{height:100%;border-radius:99px;background:var(--sp-accent);transition:width .35s ease}
         .schedule-progress-foot{font-size:.76rem;color:var(--bs-secondary-color);margin-top:9px}
         @media(max-width:575.98px){.schedule-progress-alert{padding:13px 14px}.schedule-progress-head{align-items:flex-start;flex-direction:column;gap:8px}.schedule-progress-grid{gap:7px}.schedule-progress-value{font-size:1.12rem}.schedule-progress-label{font-size:.69rem}}
+
+        /* v81: keep module navigation sticky outside the dashboard's scroll/overflow context. */
+        .module-navigation-shell {
+            position:-webkit-sticky !important;
+            position:sticky !important;
+            top:var(--app-header-height, 76px) !important;
+            z-index:1001 !important;
+            width:100%;
+            padding:0 clamp(16px,2vw,26px);
+            margin:0 0 1.5rem;
+            background:var(--card-solid) !important;
+            border-bottom:1px solid var(--border) !important;
+            box-shadow:0 8px 16px rgba(0,0,0,.10) !important;
+            isolation:isolate;
+        }
+        .module-navigation-shell .module-navigation {
+            position:relative !important;
+            top:auto !important;
+            z-index:auto !important;
+            width:100%;
+            margin:0 !important;
+            background:transparent !important;
+            border:0 !important;
+            box-shadow:none !important;
+            overflow-x:auto !important;
+            overflow-y:hidden !important;
+            -webkit-overflow-scrolling:touch;
+            overscroll-behavior-x:contain;
+            scrollbar-width:thin;
+        }
+        .header {
+            z-index:1002 !important;
+        }
+        @media(max-width:575.98px) {
+            .module-navigation-shell {
+                padding-inline:12px;
+                margin-bottom:1.1rem;
+            }
+        }
+
+
+
 </style>
             <div class="row g-3 mb-4">
-                <div class="col-12 col-xl-4"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-people-fill"></i></div><div><div class="chart-title mb-0">Keberadaan Keluarga</div><div class="bp-breakdown-subtitle">Satu hitungan per UUID · <code>ada_keluarga_label</code></div></div></div><div id="businessFamilyChart" style="min-height:245px"></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Status</th><th class="text-end">Jumlah</th><th class="text-end">% Assignment</th></tr></thead><tbody id="businessFamilyRows"></tbody></table></div></div></div>
-                <div class="col-12 col-xl-4"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-shop"></i></div><div><div class="chart-title mb-0">Usaha Keluarga</div><div class="bp-breakdown-subtitle">Satu baris per objek · <code>ada_bang_usaha_label</code></div></div></div><div id="businessFamilyBusinessChart" style="min-height:245px"></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Status</th><th class="text-end">Jumlah</th><th class="text-end">% Catatan</th></tr></thead><tbody id="businessFamilyBusinessRows"></tbody></table></div></div></div>
-                <div class="col-12 col-xl-4"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-building"></i></div><div><div class="chart-title mb-0">Usaha BKU</div><div class="bp-breakdown-subtitle">Satu baris per objek · <code>keberadaan_usaha_label</code></div></div></div><div id="businessBkuChart" style="min-height:245px"></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Status</th><th class="text-end">Jumlah</th><th class="text-end">% Catatan</th></tr></thead><tbody id="businessBkuRows"></tbody></table></div></div></div>
+                <div class="col-12 col-xl-4"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-people-fill"></i></div><div><div class="chart-title mb-0">Keberadaan Keluarga</div><div class="bp-breakdown-subtitle">Satu hitungan per UUID · <code>ada_keluarga_label</code></div></div></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Status</th><th class="text-end">Jumlah</th><th class="text-end">% Assignment</th></tr></thead><tbody id="businessFamilyRows"></tbody></table></div></div></div>
+                <div class="col-12 col-xl-4"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-shop"></i></div><div><div class="chart-title mb-0">Usaha Keluarga</div><div class="bp-breakdown-subtitle">Satu baris per objek · <code>ada_bang_usaha_label</code></div></div></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Status</th><th class="text-end">Jumlah</th><th class="text-end">% Catatan</th></tr></thead><tbody id="businessFamilyBusinessRows"></tbody></table></div></div></div>
+                <div class="col-12 col-xl-4"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-building"></i></div><div><div class="chart-title mb-0">Usaha BKU</div><div class="bp-breakdown-subtitle">Satu baris per objek · <code>keberadaan_usaha_label</code></div></div></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Status</th><th class="text-end">Jumlah</th><th class="text-end">% Catatan</th></tr></thead><tbody id="businessBkuRows"></tbody></table></div></div></div>
             </div>
             <div class="chart-card mt-5 mb-4"><div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2"><div class="chart-title m-0">Rekapitulasi Assignment & Petugas per Sub-SLS</div><button class="btn btn-sm btn-success" id="btnBusinessExport"><i class="bi bi-file-earmark-excel me-1"></i>Export Excel</button></div><div class="small text-secondary mb-3">Satu baris untuk setiap assignment pada file Excel. Nama PPL dan PML dicocokkan otomatis berdasarkan ID Sub-SLS (regionCode). URL membuka assignment di FASIH.</div><div id="businessRegionTable" class="bp-data-table"></div></div>
         </section>
 
             </div>
+
+        <section id="deploymentModule" class="d-none">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                <div>
+                    <h3 class="mb-1"><i class="bi bi-diagram-3-fill text-primary me-2"></i>Rekapitulasi per Petugas</h3>
+                    <div class="text-secondary small">Rekap jumlah assignment Keluarga, Usaha Keluarga, dan Usaha BKU berdasarkan status untuk setiap PPL/PCL.</div>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="small text-secondary mb-0 text-nowrap" for="deploymentHistorySelect">Snapshot:</label>
+                        <select class="form-select form-select-sm" id="deploymentHistorySelect" style="width:auto;min-width:150px;max-width:190px"><option value="">Memuat riwayat...</option></select>
+                    </div>
+                    <button class="btn btn-success btn-sm text-nowrap" id="btnExportDeploymentOfficer"><i class="bi bi-file-earmark-excel me-1"></i>Export Excel</button>
+                </div>
+            </div>
+            <div class="deployment-category-tabs mb-3" role="tablist" aria-label="Kategori deployment">
+                <button type="button" class="deployment-category-tab active" data-deployment-category="keluarga" role="tab" aria-selected="true"><i class="bi bi-people-fill me-1"></i>Keluarga</button>
+                <button type="button" class="deployment-category-tab" data-deployment-category="usaha_keluarga" role="tab" aria-selected="false"><i class="bi bi-house-check-fill me-1"></i>Usaha Keluarga</button>
+                <button type="button" class="deployment-category-tab" data-deployment-category="usaha_bku" role="tab" aria-selected="false"><i class="bi bi-shop me-1"></i>Usaha BKU</button>
+            </div>
+            <div class="chart-card mb-3" id="deploymentSummaryPanel">
+                <div class="row g-3 align-items-center">
+                    <div class="col-12 col-md-4">
+                        <div class="kpi-title">Total ID Sub-SLS unik</div>
+                        <div class="kpi-value" id="deploymentTotalUnique">-</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="kpi-title">Cocok</div>
+                        <div class="kpi-value text-success" id="deploymentMatchedSsls">-</div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="kpi-title">Tidak cocok</div>
+                        <div class="kpi-value text-warning" id="deploymentUnmatchedSsls">-</div>
+                    </div>
+                    <div class="col-12 col-md-3 text-md-end">
+                        <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="offcanvas" data-bs-target="#deploymentReconciliationOffcanvas" aria-controls="deploymentReconciliationOffcanvas">
+                            <i class="bi bi-search me-1"></i>Lihat detail <span class="badge text-bg-warning ms-1" id="deploymentIssueBadge">-</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center small text-secondary mt-3 mb-1">
+                    <span>Progress pencocokan ID Sub-SLS</span>
+                    <strong id="deploymentMatchPercent">-</strong>
+                </div>
+                <div class="progress" role="progressbar" aria-label="Progress pencocokan Sub-SLS" aria-valuemin="0" aria-valuemax="100" style="height:9px">
+                    <div class="progress-bar bg-success" id="deploymentMatchProgress" style="width:0%"></div>
+                </div>
+            </div>
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="deploymentReconciliationOffcanvas" aria-labelledby="deploymentReconciliationTitle" style="--bs-offcanvas-width:min(760px, 94vw)">
+                <div class="offcanvas-header border-bottom">
+                    <div>
+                        <h5 class="offcanvas-title" id="deploymentReconciliationTitle">Detail Rekonsiliasi Sub-SLS</h5>
+                        <div class="small text-secondary" id="deploymentReconciliationCount">-</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Tutup"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <div class="small text-secondary mb-3">Daftar ID Sub-SLS yang tidak cocok antara file Excel Deployment dan regionCode FASIH, beserta petugas terkait.</div>
+                    <input type="search" class="form-control form-control-sm mb-3" id="deploymentReconciliationSearch" placeholder="Cari ID Sub-SLS, nama petugas, atau status..." aria-label="Cari rekonsiliasi Sub-SLS">
+                    <div class="table-responsive deployment-reconciliation-wrap">
+                        <table class="table table-sm align-middle deployment-reconciliation-table mb-0">
+                            <thead><tr><th style="min-width:180px">ID Sub-SLS</th><th style="min-width:220px">Petugas PPL/PCL</th><th style="min-width:170px">Kategori Excel</th><th style="min-width:190px">Status Pencocokan</th></tr></thead>
+                            <tbody id="deploymentReconciliationBody"><tr><td colspan="4" class="text-center text-secondary py-4">Memuat rekonsiliasi...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-3 mb-3" id="deploymentDonutCharts">
+                <div class="col-12 col-xl-4"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-people-fill"></i></div><div><div class="chart-title mb-0">Keluarga</div><div class="bp-breakdown-subtitle">Rekap status keberadaan keluarga</div></div></div><div id="deploymentDonutKeluarga" style="min-height:245px"></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Status</th><th class="text-end">Jumlah</th><th class="text-end">%</th></tr></thead><tbody id="deploymentDonutKeluargaRows"></tbody></table></div></div></div>
+                <div class="col-12 col-xl-4"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-house-check-fill"></i></div><div><div class="chart-title mb-0">Usaha Keluarga</div><div class="bp-breakdown-subtitle">Rekap status keberadaan usaha keluarga</div></div></div><div id="deploymentDonutUsahaKeluarga" style="min-height:245px"></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Status</th><th class="text-end">Jumlah</th><th class="text-end">%</th></tr></thead><tbody id="deploymentDonutUsahaKeluargaRows"></tbody></table></div></div></div>
+                <div class="col-12 col-xl-4"><div class="bp-breakdown-card"><div class="bp-breakdown-head"><div class="bp-breakdown-icon"><i class="bi bi-building"></i></div><div><div class="chart-title mb-0">Usaha BKU</div><div class="bp-breakdown-subtitle">Rekap status keberadaan usaha BKU</div></div></div><div id="deploymentDonutBku" style="min-height:245px"></div><div class="table-responsive"><table class="table bp-breakdown-table"><thead><tr><th>Status</th><th class="text-end">Jumlah</th><th class="text-end">%</th></tr></thead><tbody id="deploymentDonutBkuRows"></tbody></table></div></div></div>
+            </div>
+            <div class="chart-card">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                    <div class="chart-title mb-0">Rincian Deployment per Petugas</div>
+                    <div class="small text-secondary" id="deploymentUpdatedInfo">Memuat data...</div>
+                </div>
+                <div class="small text-secondary mb-3">Pencocokan: SSLS pada file sumber → ID Sub-SLS/regionCode → petugas PPL/PCL dari data FASIH. Gunakan pencarian untuk menemukan nama petugas atau ID Sub-SLS.</div>
+                <div class="deployment-table-toolbar">
+                    <input type="search" class="form-control form-control-sm deployment-table-search" id="deploymentOfficerSearch" placeholder="Cari nama petugas atau ID Sub-SLS..." aria-label="Cari nama petugas atau ID Sub-SLS">
+                    <div class="small text-secondary" id="deploymentTableCount">-</div>
+                </div>
+                <div class="deployment-table-wrap"><div id="deploymentOfficerTable"></div></div>
+            </div>
+        </section>
 
             <script>
                 (() => {
@@ -1947,10 +2849,12 @@
             <script src="js/charts.js"></script>
             <script src="js/master_subsls.js"></script>
             <script src="js/table.js"></script>
-            <script src="js/comparison.js"></script>
-            <script src="js/app.js"></script>
+            <script src="js/comparison.js?v=85"></script>
+            <script src="js/app.js?v=85"></script>
             <script src="js/se2026_workload.js"></script>
+            <script src="js/se2026_deployment_officers.js"></script>
             <script src="js/business/business_app.js"></script>
+            <script src="js/deployment_officers.js"></script>
 
 </body>
 
